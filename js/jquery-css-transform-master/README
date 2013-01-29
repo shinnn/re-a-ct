@@ -1,0 +1,51 @@
+-----------------------------
+READ ME
+-----------------------------
+jquery-css-transform
+Zachary Johnson
+www.zachstronaut.com
+
+This monkey patch for jQuery 1.3.1+ allows you to set and get CSS Transforms
+in Safari/Chrome/Webkit, Firefox 3.5+, IE 9+, and Opera 11+ in a uniform way
+with the jQuery css() method.  You can simply do the following rather than
+using browser specific properties:
+
+$('#example').css('transform', 'rotate(165deg)'); // Set rotation transform
+$('#example').css({transform: 'rotate(165deg)'}); // Set rotation transform
+$('#example').css('transform'); // Get and return transform string as it was set
+
+To use the patch, load jquery-css-transform.js in your project after loading jQuery.
+
+For more information visit:
+http://www.zachstronaut.com/posts/2009/02/22/jquery-patch-css-transform.html
+
+This code is currently available for use in all personal or commercial projects
+under both MIT and GPL licenses, just like jQuery. 
+
+-----------------------------
+Change Log
+-----------------------------
+
+2011.05.04 - Temporary solution for current 1.6.x incompatibility, while preserving 1.3.x
+             compatibility, until I can rewrite using CSS Hooks.
+           - Included change proposed by Damian Poole to avoid problems in IE 9 RC 2.
+
+2010.11.26 - Add support for IE9 (Platform Preview 7) and probably Opera.
+
+2010.11.06 - Update to address new behavior in jQuery 1.4.3 where getting the
+             transform property with css() would return a matrix instead of
+             the transformation string as set by the user.  It is important to
+             note that this patch forces the old behavior at this time in order
+             to properly support old code using this patch.
+           - Update to correctly support setting transform via
+             css({transform: value}) style syntax. (Guess I missed something
+             in that 2009.07.15 update.)
+
+2009.07.15 - Update to make sure that you can use css({transform: value}) style syntax, too.
+
+2009.05.24 - Updated to usual jQuery patch/plugin pattern where jQuery is passed in as $ argument.
+           - Monkey Patched call to css() really only needed key as a named argument.
+           - Neither of these updates really change anything.  Mostly just code cleanliness issues.
+
+2009.02.23 - Added to GitHub.
+

@@ -1,0 +1,104 @@
+@charset "UTF-8";
+
+$interval : 542 * 0.001;
+
+$animaWidth : 50px;
+$animaHeight : 75px;
+$fontSize : 17px;
+
+.frog{
+	width: 33px;
+	height: 33px;
+  background:none #000000 repeat;
+  box-shadow: 0 0 30px 4px rgba(0, 0, 0, 0.45);
+	color: #FFFFFF;
+	font-size: $fontSize;
+	font-weight: bold;
+	text-align: center;
+  line-height: 2em;
+  //letter-spacing: 10;
+}
+
+.released{
+	width: $animaWidth; 
+	height: $animaHeight;
+  background:none #0079EB;
+}
+
+.rev0{
+	width: $animaWidth * 1.1; 
+	height: $animaHeight * 1.1;
+	background: none #000AEB;
+  font-size: $fontSize * 1.1;
+}
+
+.rev1{
+	width: $animaWidth * 1.2; 
+	height: $animaHeight * 1.2;
+	background: none #5F00EB;
+  font-size: $fontSize * 1.2;
+}
+
+.rev2{
+	width: $animaWidth * 1.3; 
+	height: $animaHeight * 1.3;
+	background: none #8900EB;
+  font-size: $fontSize * 1.3;
+}
+
+.rev3{
+	width: $animaWidth * 1.4;
+	height: $animaHeight * 1.4;
+	background: none #C500EB;
+  font-size: $fontSize * 1.4;
+}
+
+.rev4{
+	width: $animaWidth * 1.5;
+	height: $animaHeight * 1.5;
+	background: none #EB00CC;
+  font-size: $fontSize * 1.5;
+}
+
+.rev5{
+	width: $animaWidth * 1.6;
+	height: $animaHeight * 1.6;
+	background: none #EB006B;
+  font-size: $fontSize * 1.6;
+}
+
+.rev6{
+	width: $animaWidth * 1.7;
+	height: $animaHeight * 1.7;
+	background: none #EB0038;
+  font-size: $fontSize * 1.7;
+}
+
+.rev7{
+	width: $animaWidth * 1.8;
+	height: $animaHeight * 1.8;
+	background: none #EB4F00;
+  font-size: $fontSize * 1.8;
+}
+
+.rev8{
+	width: $animaWidth * 1.9;
+	height: $animaHeight * 1.9;
+	background: none #EBA300;
+  font-size: $fontSize * 1.9;
+}
+
+.rev9{
+	width: $animaWidth * 2;
+	height: $animaHeight * 2;
+	background: none #EBD300;
+  font-size: $fontSize * 2;
+}
+
+.rev10{
+	width: $animaWidth * 2.1;
+	height: $animaHeight * 2.1;
+	background: none #FFFFFF;
+  color: #DDDDDD;
+  font-size: $fontSize * 2.1;
+}

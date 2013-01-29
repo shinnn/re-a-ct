@@ -1,0 +1,114 @@
+@charset "UTF-8";
+/* line 5, ../scss/styles.scss */
+html, body, #container, #frogLayer, #rippleLayer {
+  background: #FBFBFB;
+  width: 100%;
+  height: 100%;
+  cursor: url(../img/cursor.png), crosshair;
+}
+/* line 11, ../scss/styles.scss */
+html ::selection, body ::selection, #container ::selection, #frogLayer ::selection, #rippleLayer ::selection {
+  background-color: transparent;
+}
+
+/* line 16, ../scss/styles.scss */
+#welcome {
+  display: none;
+  position: fixed;
+  bottom: 40%;
+  left: 50%;
+  width: 1000px;
+  height: 700px;
+  font-weight: bold;
+}
+
+/* line 29, ../scss/styles.scss */
+.frog {
+  position: absolute;
+  opacity: 0;
+  width: 33px;
+  height: 93px;
+  background: url(../img/rev.png) 50% 50% no-repeat;
+  background-size: contain;
+  font-size: 0px;
+}
+
+@keyframes swell {
+  /* line 45, ../scss/styles.scss */
+  0% {
+    padding: 0;
+  }
+
+  /* line 48, ../scss/styles.scss */
+  50% {
+    padding: 10px;
+  }
+
+  /* line 51, ../scss/styles.scss */
+  100% {
+    padding: 0;
+  }
+}
+
+/* line 56, ../scss/styles.scss */
+.released {
+  width: 33px;
+  height: 93px;
+  animation-name: 'swell';
+  animation-duration: 0.3794s;
+  animation-timing-function: ease;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+
+/* line 67, ../scss/styles.scss */
+.rev0 {
+  width: 45px;
+  height: 115px;
+}
+
+/* line 73, ../scss/styles.scss */
+.rev1 {
+  width: 55px;
+  height: 120px;
+}
+
+/* line 79, ../scss/styles.scss */
+.rev2 {
+  width: 70px;
+  height: 130px;
+}
+
+@keyframes ripple {
+  /* line 86, ../scss/styles.scss */
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  /* line 90, ../scss/styles.scss */
+  45% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+
+  /* line 95, ../scss/styles.scss */
+  100% {
+    opacity: 0.9;
+    transform: scale(0);
+  }
+}
+
+/* line 102, ../scss/styles.scss */
+.ripple {
+  animation-name: 'ripple';
+  animation-duration: 0.542s;
+  animation-timing-function: cubic-bezier(0.69, 0.14, 0.79, 0.9);
+  animation-iteration-count: 1;
+  animation-direction: reverse;
+  animation-fill-mode: backwards;
+  position: absolute;
+  opacity: 0;
+  border: blue 3px solid;
+}

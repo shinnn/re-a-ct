@@ -1,0 +1,109 @@
+@charset "UTF-8";
+/* line 9, ../scss/rect.scss */
+.frog {
+  width: 33px;
+  height: 33px;
+  background: none #000000 repeat;
+  box-shadow: 0 0 30px 4px rgba(0, 0, 0, 0.45);
+  color: #FFFFFF;
+  font-size: 17px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 2em;
+}
+
+/* line 22, ../scss/rect.scss */
+.released {
+  width: 50px;
+  height: 75px;
+  background: none #0079EB;
+}
+
+/* line 28, ../scss/rect.scss */
+.rev0 {
+  width: 55.0px;
+  height: 82.5px;
+  background: none #000AEB;
+  font-size: 18.7px;
+}
+
+/* line 35, ../scss/rect.scss */
+.rev1 {
+  width: 60px;
+  height: 90px;
+  background: none #5F00EB;
+  font-size: 20.4px;
+}
+
+/* line 42, ../scss/rect.scss */
+.rev2 {
+  width: 65px;
+  height: 97.5px;
+  background: none #8900EB;
+  font-size: 22.1px;
+}
+
+/* line 49, ../scss/rect.scss */
+.rev3 {
+  width: 70px;
+  height: 105px;
+  background: none #C500EB;
+  font-size: 23.8px;
+}
+
+/* line 56, ../scss/rect.scss */
+.rev4 {
+  width: 75px;
+  height: 112.5px;
+  background: none #EB00CC;
+  font-size: 25.5px;
+}
+
+/* line 63, ../scss/rect.scss */
+.rev5 {
+  width: 80px;
+  height: 120px;
+  background: none #EB006B;
+  font-size: 27.2px;
+}
+
+/* line 70, ../scss/rect.scss */
+.rev6 {
+  width: 85px;
+  height: 127.5px;
+  background: none #EB0038;
+  font-size: 28.9px;
+}
+
+/* line 77, ../scss/rect.scss */
+.rev7 {
+  width: 90px;
+  height: 135px;
+  background: none #EB4F00;
+  font-size: 30.6px;
+}
+
+/* line 84, ../scss/rect.scss */
+.rev8 {
+  width: 95px;
+  height: 142.5px;
+  background: none #EBA300;
+  font-size: 32.3px;
+}
+
+/* line 91, ../scss/rect.scss */
+.rev9 {
+  width: 100px;
+  height: 150px;
+  background: none #EBD300;
+  font-size: 34px;
+}
+
+/* line 98, ../scss/rect.scss */
+.rev10 {
+  width: 105px;
+  height: 157.5px;
+  background: none #FFFFFF;
+  color: #DDDDDD;
+  font-size: 35.7px;
+}

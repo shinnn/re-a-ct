@@ -17,7 +17,7 @@ var animaY = 0;
 var initX=0;
 var initY=0;
 
-var source = new Array();
+var source = [];
 
 var classLevel = new Array(11); // 最終が revX なら X+1 で作成
 
@@ -47,10 +47,10 @@ $(function(){
     "beat7.wav",
     "beat8.wav",
     "beat9.wav",
-    "beat10.wav",
+    "beat10.wav"
   ];
 	
-  for(var i=0; i < audioPath.length; i++){
+  for(i=0; i < audioPath.length; i++){
     audioPath[i] = "audio/" + audioPath[i];
   }
 	
@@ -98,7 +98,7 @@ $(function(){
       }
       //document.getElementsByTagName('head')[0].appendChild(ss);
     });
-    
+    Mousetrap.trigger('m');
 		/*
     bgloop.addEventListener('ended', function(){
       //console.log("end at " + ctx.currentTime);
@@ -127,7 +127,7 @@ $(function(){
         obj.addClass('released');
       });
     });
-  }
+  };
 
   //click にバインドするより操作性が高い
   $(document.getElementById('container')).mousedown(function(e){
@@ -264,7 +264,7 @@ function levelCheck(cl){ //tmp
 
 var time = 0;
 var interval = 542; //542;
-var hitInterval = interval * 0.00048 // 0.001 * 1/12 * 4
+var hitInterval = interval * 0.00048; // 0.001 * 1/12 * 4
 var frog, released, varXY, hit, hitObj;
 function schedule(){
   var currentTime = ctx.currentTime - startTime;
@@ -279,7 +279,7 @@ function schedule(){
   }
   while(noteTime <= currentTime){
     noteTime += (interval*0.0001);
-    if(time%5 == 0){
+    if(time%5 === 0){
       
       if(createStart === true){
         panner.setPosition((animaX - window.innerWidth * 0.5) * 0.01, 0, 10);
@@ -397,7 +397,7 @@ function schedule(){
               break;
             }
           }
-          for(var j=0; j < classLevel.length; j++){
+          for(j=0; j < classLevel.length; j++){
             if(cl.contains(classLevel[j])){
               
               break;
@@ -412,14 +412,14 @@ function schedule(){
               left: '+=' + varX,
               top: '+=' + varY,
               //opacity: '-=' + 0.005 * len,
-              rotate: Math.atan2(varX, -varY) * 180 / Math.PI + 'deg',
+              rotate: Math.atan2(varX, -varY) * 180 / Math.PI + 'deg'
             },
             interval - 1
           );
         }
                 
         playPad(/* (off.left-$(document).width()*0.5)*0.01 + 5 */);
-      };
+      }
       $(".ripple:gt(" + (len*2 <= 15? len*2: 15) + ")").remove();
       
       if(hit > 0){

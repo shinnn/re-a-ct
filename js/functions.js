@@ -82,9 +82,10 @@ $(function(){
     //m key binding
     // http://yuiblog.com/blog/2008/07/22/non-blocking-scripts/
     var ss = document.createElement('link');
-      ss.href = 'css/rect.css';
-      ss.rel = 'stylesheet';
-      ss.media = 'screen';
+    ss.href = 'css/rect.css';
+    ss.rel = 'stylesheet';
+    ss.media = 'screen';
+		
     Mousetrap.bind(['m', 'M'], function(){
       var h = document.getElementsByTagName('head')[0];
       var sheets = h.getElementsByTagName('link');
@@ -98,7 +99,7 @@ $(function(){
       }
       //document.getElementsByTagName('head')[0].appendChild(ss);
     });
-    Mousetrap.trigger('m');
+    Mousetrap.trigger(['m', 'M']);
 		/*
     bgloop.addEventListener('ended', function(){
       //console.log("end at " + ctx.currentTime);

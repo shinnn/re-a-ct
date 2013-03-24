@@ -25,7 +25,7 @@ $(function(){
   try{
     ctx = new webkitAudioContext();
   }catch(e){
-    alert('Web Audio API is not supported in this browser');
+    alert('Web Audio API is not supported in this browser.\nPlease launch this site again with Google Chrome.');
   }
   
   for(var i=0; i < classLevel.length; i++){

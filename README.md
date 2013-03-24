@@ -1,4 +1,3 @@
-re-a-ct
-=======
+#re-a-ct
 
-Sound Interaction with HTML5 Web Audio API
+キャラクターとともに生成される音を楽しむWebアプリケーションです。

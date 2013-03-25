@@ -447,6 +447,7 @@ function restartAnimation(elm){
   elm.style.webkitAnimation = '';
   var parent = document.getElementById('container');
   
+	
   var ripple = "<div class='ripple' style='"
   + "width:" + varXY + "px;"
   + "height:" + varXY + "px;"

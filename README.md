@@ -3,4 +3,4 @@
 キャラクターとともに生成される音を楽しむWebアプリケーションです。
 
 ##動作環境
-Google Chromeでのみ正常に動作します。[こちら](https://www.google.com/intl/ja/chrome/)からダウンロードできます。
+Google Chromeでのみ正常に動作します。Chromeは[こちら](https://www.google.com/intl/ja/chrome/)からダウンロードできます。

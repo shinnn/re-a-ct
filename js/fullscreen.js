@@ -1,5 +1,9 @@
-//TODO: ref: https://developer.mozilla.org/ja/docs/DOM/Using_full-screen_mode
+/*
+ * Copyright (c) 2012-2013 Shinnosuke Watanabe
+ * https://github.com/shinnn
+*/
 
+//TODO: ref: https://developer.mozilla.org/ja/docs/DOM/Using_full-screen_mode
 $(function(){
   function toggleFullscreen(){
     if(document.webkitIsFullScreen){

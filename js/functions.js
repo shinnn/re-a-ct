@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2012-2013 Shinnosuke Watanabe
+ * https://github.com/shinnn
+*/
+
 var ctx;
 var panner;
 var bufferLoader;
@@ -11,11 +16,8 @@ var bgloop = new Audio('audio/background.wav');
 bgloop.autoplay = false;
 bgloop.loop = false;
 
-var animaX = 0;
-var animaY = 0;
-
-var initX=0;
-var initY=0;
+var animaX = 0, animaY = 0;
+var initX = 0, initY = 0;
 
 var source = [];
 
@@ -87,14 +89,14 @@ $(function(){
     ss.media = 'screen';
 		
     Mousetrap.bind(['m', 'M'], function(){
-      var h = document.getElementsByTagName('head')[0];
-      var sheets = h.getElementsByTagName('link');
+      var head = document.getElementsByTagName('head')[0];
+      var sheets = head.getElementsByTagName('link');
       if(sheets[sheets.length-1] === ss){
-        h.removeChild(ss);
+        head.removeChild(ss);
         console.log('remove style');
       }else{
         // http://www.softel.co.jp/blogs/tech/archives/994
-        h.insertBefore(ss, h.getElementsByTagName('script')[0]);
+        head.insertBefore(ss, head.getElementsByTagName('script')[0]);
         console.log('append style');
       }
       //document.getElementsByTagName('head')[0].appendChild(ss);
@@ -260,7 +262,6 @@ function levelCheck(cl){ //tmp
   }else{
     console.log('final level');
   }
- 
 }
 
 var time = 0;
@@ -300,8 +301,7 @@ function schedule(){
       hit = 0;
 			
       var i, elm, obj, varX, varY;
-      var inW = window.innerWidth;
-      var inH = window.innerHeight;
+      var inW = window.innerWidth, inH = window.innerHeight;
       //each method start
       for(i=0; i < len; i++){
         var current = i + Math.round(Math.random());
@@ -447,7 +447,16 @@ function restartAnimation(elm){
   elm.style.webkitAnimation = '';
   var parent = document.getElementById('container');
   
+	var ripple = document.createElement('div');
+	ripple.className = 'ripple';
+	ripple.style.width = varXY + 'px';
+	ripple.style.height = varXY + 'px';
+	ripple.style.borderRadius = varXY + 'px';
+	ripple.style.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
+	ripple.style.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
+	ripple.style.webkitAnimationDuration = hit * hitInterval + 's';
 	
+	/**
   var ripple = "<div class='ripple' style='"
   + "width:" + varXY + "px;"
   + "height:" + varXY + "px;"
@@ -456,8 +465,9 @@ function restartAnimation(elm){
   + "top: " + (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px;'
   + "-webkit-animation-duration:" + hit * hitInterval + 's;'
   + "'></div>";
+	**/
 
-  parent.insertBefore($(ripple).get(0), parent.childNodes[0]);
+  parent.insertBefore(ripple, parent.childNodes[0]);
 }
 
 // Visualize
@@ -465,8 +475,15 @@ function restartAnimation(elm){
 function createAnima(duration){
   initX = Math.floor(Math.random() * window.innerWidth);
   initY = Math.random() < 0.5? -30: window.innerHeight;
-  var frog = $("<div class='frog' style='left: " +initX+ "px; top: " +initY+ "px'>o o</div>");
-  frog.animaMove(animaX - initX, animaY - initY, duration * 1000);
+	
+	var frog = document.createElement('div');
+	frog.className = 'frog';
+	frog.innerText = 'o o';
+	frog.style.left = initX + 'px';
+	frog.style.top = initY + 'px';
+	
+  $(frog).animaMove(animaX - initX, animaY - initY, duration * 1000);
+
   var parent = document.getElementById('container');
-  parent.insertBefore(frog.get(0), parent.childNodes[0]);
+  parent.insertBefore(frog, parent.childNodes[0]);
 }

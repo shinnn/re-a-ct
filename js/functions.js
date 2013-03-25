@@ -478,7 +478,7 @@ function createAnima(duration){
 	
 	var frog = document.createElement('div');
 	frog.className = 'frog';
-	frog.innerText = 'o o';
+	frog.innerText = 'o o'; //眼の描画
 	frog.style.left = initX + 'px';
 	frog.style.top = initY + 'px';
 	

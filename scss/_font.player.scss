@@ -1,0 +1,26 @@
+@font-face {
+  font-family: 'player';
+  src: url("../font/player/player.eot?38789062");
+  src: url("../font/player/player.eot?38789062#iefix") format('embedded-opentype'),
+    url("../font/player/player.woff?38789062") format('woff'),
+    url("../font/player/player.ttf?38789062") format('truetype'),
+    url("../font/player/player.svg?38789062#player") format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'player';
+    src: url('../font/player.svg?38789062#player') format('svg');
+  }
+}
+*/
+
+.icon-pause:before { content: '\2389'; } /* '⎉' */
+.icon-fast-forward:before { content: '\23e9'; } /* '⏩' */
+.icon-fast-backward:before { content: '\23ea'; } /* '⏪' */
+.icon-stop:before { content: '\25a0'; } /* '■' */
+.icon-play:before { content: '\25b6'; } /* '▶' */

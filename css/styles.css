@@ -1,17 +1,232 @@
 @charset "UTF-8";
-/* line 5, ../scss/styles.scss */
+/* line 1, ../scss/_interface.scss */
+#track-control {
+  float: left;
+  width: 50px;
+  height: 50px;
+  margin: 0 0 0 0;
+  color: white;
+  font-family: 'player';
+  font-size: 40px;
+}
+/* line 10, ../scss/_interface.scss */
+#track-control div {
+  float: left;
+  cursor: pointer;
+}
+
+/* line 20, ../scss/_interface.scss */
+#volume {
+  width: 150px;
+  height: 50px;
+  margin: 0px 0 0 0;
+  float: left;
+}
+
+/* line 27, ../scss/_interface.scss */
+#bg_volume, #se_volume {
+  width: 150px;
+  height: 20px;
+  margin: 0 0 10px 0;
+  float: none;
+  position: relative;
+}
+
+/* line 34, ../scss/_interface.scss */
+.slider {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #333 #333 #777 #333;
+  border-radius: 25px;
+  width: 100px;
+  position: absolute;
+  height: 13px;
+  background-color: #8e8d8d;
+  background: url("../img/bg-track.png") repeat top left;
+  box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
+  left: 20px;
+}
+
+/* line 48, ../scss/_interface.scss */
+.tooltip {
+  position: absolute;
+  display: block;
+  top: -25px;
+  width: 35px;
+  height: 20px;
+  color: #fff;
+  text-align: center;
+  font: 10pt Tahoma, Arial, sans-serif;
+  border-radius: 3px;
+  border: 1px solid #333;
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  background: -webkit-linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* IE10+ */
+  background: linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* W3C */
+}
+
+/* line 66, ../scss/_interface.scss */
+.icon_volume {
+  content: "";
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  right: -5px;
+  background: url("../img/volume.png") no-repeat 0 -75px;
+  position: absolute;
+  margin-top: -5px;
+}
+
+/* line 76, ../scss/_interface.scss */
+.ui-slider-handle {
+  position: absolute;
+  z-index: 2;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  background: url("../img/handle.png") no-repeat 50% 50%;
+  font-weight: bold;
+  color: #1C94C4;
+  outline: none;
+  top: -7px;
+  margin-left: -12px;
+}
+
+/* line 89, ../scss/_interface.scss */
+.ui-slider-range {
+  background: #ffffff;
+  /* Old browsers */
+  background: linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eaeaea',GradientType=0 );
+  /* IE6-9 */
+  position: absolute;
+  border: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 25px;
+}
+
+@font-face {
+  font-family: 'player';
+  src: url("../font/player/player.eot?38789062");
+  src: url("../font/player/player.eot?38789062#iefix") format("embedded-opentype"), url("../font/player/player.woff?38789062") format("woff"), url("../font/player/player.ttf?38789062") format("truetype"), url("../font/player/player.svg?38789062#player") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'player';
+    src: url('../font/player.svg?38789062#player') format('svg');
+  }
+}
+*/
+/* line 22, ../scss/_font.player.scss */
+.icon-pause:before {
+  content: '\2389';
+}
+
+/* '⎉' */
+/* line 23, ../scss/_font.player.scss */
+.icon-fast-forward:before {
+  content: '\23e9';
+}
+
+/* '⏩' */
+/* line 24, ../scss/_font.player.scss */
+.icon-fast-backward:before {
+  content: '\23ea';
+}
+
+/* '⏪' */
+/* line 25, ../scss/_font.player.scss */
+.icon-stop:before {
+  content: '\25a0';
+}
+
+/* '■' */
+/* line 26, ../scss/_font.player.scss */
+.icon-play:before {
+  content: '\25b6';
+}
+
+/* '▶' */
+@font-face {
+  font-family: 'player';
+  src: url("../font/player/player.eot?38789062");
+  src: url("../font/player/player.eot?38789062#iefix") format("embedded-opentype"), url("../font/player/player.woff?38789062") format("woff"), url("../font/player/player.ttf?38789062") format("truetype"), url("../font/player/player.svg?38789062#player") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'player';
+    src: url('../font/player.svg?38789062#player') format('svg');
+  }
+}
+*/
+/* line 22, ../scss/_font.player.scss */
+.icon-pause:before {
+  content: '\2389';
+}
+
+/* '⎉' */
+/* line 23, ../scss/_font.player.scss */
+.icon-fast-forward:before {
+  content: '\23e9';
+}
+
+/* '⏩' */
+/* line 24, ../scss/_font.player.scss */
+.icon-fast-backward:before {
+  content: '\23ea';
+}
+
+/* '⏪' */
+/* line 25, ../scss/_font.player.scss */
+.icon-stop:before {
+  content: '\25a0';
+}
+
+/* '■' */
+/* line 26, ../scss/_font.player.scss */
+.icon-play:before {
+  content: '\25b6';
+}
+
+/* '▶' */
+/* line 9, ../scss/styles.scss */
 html, body, #container, #frogLayer, #rippleLayer {
   background: #FBFBFB;
   width: 100%;
   height: 100%;
-  cursor: url(../img/cursor.png), crosshair;
+  overflow: hidden;
 }
-/* line 11, ../scss/styles.scss */
+/* line 15, ../scss/styles.scss */
 html ::selection, body ::selection, #container ::selection, #frogLayer ::selection, #rippleLayer ::selection {
   background-color: transparent;
 }
 
-/* line 16, ../scss/styles.scss */
+/* line 20, ../scss/styles.scss */
+#container {
+  cursor: url(../img/cursor.png), crosshair;
+}
+
+/* line 24, ../scss/styles.scss */
 #welcome {
   display: none;
   position: fixed;
@@ -22,7 +237,17 @@ html ::selection, body ::selection, #container ::selection, #frogLayer ::selecti
   font-weight: bold;
 }
 
-/* line 29, ../scss/styles.scss */
+/* line 34, ../scss/styles.scss */
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 120px;
+  padding: 20px 20px 0 20px;
+  background: #0B0B0B;
+}
+
+/* line 46, ../scss/styles.scss */
 .frog {
   position: absolute;
   opacity: 0;
@@ -34,23 +259,23 @@ html ::selection, body ::selection, #container ::selection, #frogLayer ::selecti
 }
 
 @keyframes swell {
-  /* line 45, ../scss/styles.scss */
+  /* line 62, ../scss/styles.scss */
   0% {
     padding: 0;
   }
 
-  /* line 48, ../scss/styles.scss */
+  /* line 65, ../scss/styles.scss */
   50% {
     padding: 10px;
   }
 
-  /* line 51, ../scss/styles.scss */
+  /* line 68, ../scss/styles.scss */
   100% {
     padding: 0;
   }
 }
 
-/* line 56, ../scss/styles.scss */
+/* line 73, ../scss/styles.scss */
 .released {
   width: 33px;
   height: 93px;
@@ -60,24 +285,6 @@ html ::selection, body ::selection, #container ::selection, #frogLayer ::selecti
   animation-iteration-count: 1;
   animation-direction: normal;
   animation-fill-mode: forwards;
-}
-
-/* line 67, ../scss/styles.scss */
-.rev0 {
-  width: 45px;
-  height: 115px;
-}
-
-/* line 73, ../scss/styles.scss */
-.rev1 {
-  width: 55px;
-  height: 120px;
-}
-
-/* line 79, ../scss/styles.scss */
-.rev2 {
-  width: 70px;
-  height: 130px;
 }
 
 @keyframes ripple {

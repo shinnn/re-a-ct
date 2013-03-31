@@ -20,7 +20,7 @@
 }
 
 /* line 28, ../scss/rect.scss */
-.rev0 {
+.frog[data-level='0'] {
   width: 55.0px;
   height: 82.5px;
   background: none #000AEB;
@@ -28,7 +28,7 @@
 }
 
 /* line 35, ../scss/rect.scss */
-.rev1 {
+.frog[data-level='1'] {
   width: 60px;
   height: 90px;
   background: none #5F00EB;
@@ -36,7 +36,7 @@
 }
 
 /* line 42, ../scss/rect.scss */
-.rev2 {
+.frog[data-level='2'] {
   width: 65px;
   height: 97.5px;
   background: none #8900EB;
@@ -44,7 +44,7 @@
 }
 
 /* line 49, ../scss/rect.scss */
-.rev3 {
+.frog[data-level='3'] {
   width: 70px;
   height: 105px;
   background: none #C500EB;
@@ -52,7 +52,7 @@
 }
 
 /* line 56, ../scss/rect.scss */
-.rev4 {
+.frog[data-level='4'] {
   width: 75px;
   height: 112.5px;
   background: none #EB00CC;
@@ -60,7 +60,7 @@
 }
 
 /* line 63, ../scss/rect.scss */
-.rev5 {
+.frog[data-level='5'] {
   width: 80px;
   height: 120px;
   background: none #EB006B;
@@ -68,7 +68,7 @@
 }
 
 /* line 70, ../scss/rect.scss */
-.rev6 {
+.frog[data-level='6'] {
   width: 85px;
   height: 127.5px;
   background: none #EB0038;
@@ -76,7 +76,7 @@
 }
 
 /* line 77, ../scss/rect.scss */
-.rev7 {
+.frog[data-level='7'] {
   width: 90px;
   height: 135px;
   background: none #EB4F00;
@@ -84,7 +84,7 @@
 }
 
 /* line 84, ../scss/rect.scss */
-.rev8 {
+.frog[data-level='8'] {
   width: 95px;
   height: 142.5px;
   background: none #EBA300;
@@ -92,7 +92,7 @@
 }
 
 /* line 91, ../scss/rect.scss */
-.rev9 {
+.frog[data-level='9'] {
   width: 100px;
   height: 150px;
   background: none #EBD300;
@@ -100,7 +100,7 @@
 }
 
 /* line 98, ../scss/rect.scss */
-.rev10 {
+.frog[data-level='10'] {
   width: 105px;
   height: 157.5px;
   background: none #FFFFFF;

@@ -12,16 +12,37 @@ var noteTime = 0;
 var startTime = 0;
 var createStart = false;
 
+//BGM
 var bgloop = new Audio('audio/background.wav');
 bgloop.autoplay = false;
 bgloop.loop = false;
+
 
 var animaX = 0, animaY = 0;
 var initX = 0, initY = 0;
 
 var source = [];
 
-var classLevel = new Array(11); // 最終が revX なら X+1 で作成
+//効果音の音量
+var seVolume = 1;
+
+//id = 'container' のDIV。 要素の挿入でしばしば使うためキャッシュしておく
+var parent;
+
+var maxLevel = 10;
+var colorOfLevel = [
+  '#000AEB',
+  '#5F00EB',
+  '#8900EB',
+  '#C500EB',
+  '#EB00CC',
+  '#EB006B',
+  '#EB0038',
+  '#EB4F00',
+  '#EBA300',
+  '#EBD300',
+  '#FFFFFF'
+];
 
 $(function(){
   try{
@@ -30,10 +51,8 @@ $(function(){
     alert('Web Audio API is not supported in this browser.\nPlease launch this site again with Google Chrome.');
   }
   
-  for(var i=0; i < classLevel.length; i++){
-    classLevel[i] = "rev" + i;
-  }
-
+  parent = document.getElementById('container');
+  
   var audioPath = [
     "beat.wav",
     "piano.wav",
@@ -57,10 +76,12 @@ $(function(){
   }
 	
   //Load Audio Files
-  bufferLoader = new BufferLoader(ctx, audioPath, function(){
+  bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
+	
+	function bufferLoaderCallback(){
     console.log("finish load.");
 		
-    panner = ctx.createPanner();	
+    panner = ctx.createPanner();
     panner.refDistance = 0.1;
     panner.rolloffFactor = 0.05;
     panner.connect(ctx.destination);
@@ -68,10 +89,14 @@ $(function(){
     panner.distanceModel = 0;
 		
     //SPACE key binding
-    Mousetrap.bind('space', function(e){
-      e.preventDefault();
+    Mousetrap.bind('space', pauseBGloop);
+    
+    function pauseBGloop(e){
+      if(e){
+        e.preventDefault();
+      }
       if(timeoutId === false){
-				bgloop.play();
+        bgloop.play();
         startTime = ctx.currentTime - noteTime;
         schedule();
       }else{
@@ -79,7 +104,7 @@ $(function(){
         clearTimeout(timeoutId);
         timeoutId = false;
       }
-    });
+    }
     
     //m key binding
     // http://yuiblog.com/blog/2008/07/22/non-blocking-scripts/
@@ -88,9 +113,10 @@ $(function(){
     ss.rel = 'stylesheet';
     ss.media = 'screen';
 		
-    Mousetrap.bind(['m', 'M'], function(){
+    function toggleRectStyle(){
       var head = document.getElementsByTagName('head')[0];
       var sheets = head.getElementsByTagName('link');
+      
       if(sheets[sheets.length-1] === ss){
         head.removeChild(ss);
         console.log('remove style');
@@ -100,8 +126,11 @@ $(function(){
         console.log('append style');
       }
       //document.getElementsByTagName('head')[0].appendChild(ss);
-    });
+    }
+    
+    Mousetrap.bind(['m', 'M'], toggleRectStyle);
     Mousetrap.trigger(['m', 'M']);
+    
 		/*
     bgloop.addEventListener('ended', function(){
       //console.log("end at " + ctx.currentTime);
@@ -116,7 +145,8 @@ $(function(){
       schedule();
     });
     */
-  });
+  }
+	
   bufferLoader.load();
 	
   $.fn.animaMove = function(x, y, duration){
@@ -240,6 +270,8 @@ function playPad(panX){
 function playSound(buffer, dest, timing){
   var src = ctx.createBufferSource();
   src.buffer = buffer;
+  src.buffer.gain = seVolume;
+  console.log(seVolume);
   src.loop = false;
   src.connect(dest);
   src.start(ctx.currentTime + timing);
@@ -247,30 +279,17 @@ function playSound(buffer, dest, timing){
   return src;
 }
 
-function levelCheck(cl){ //tmp
-  if(cl.contains(classLevel[classLevel.length-1]) === false){
-    for(var j=0; j < classLevel.length-1; j++){
-      if(cl.contains(classLevel[j])){
-        cl.add(classLevel[j+1]);
-        cl.remove(classLevel[j]);
-        break;
-      }
-    }
-    if(j === classLevel.length-1){
-      cl.add(classLevel[0]);            
-    }
-  }else{
-    console.log('final level');
-  }
-}
-
 var time = 0;
+
+//parameters
 var interval = 542; //542;
-var hitInterval = interval * 0.00048; // 0.001 * 1/12 * 4
+var hitInterval = interval * 0.001 * 1/12 * 6;
+var movementRange = 500; //　一回の移動範囲
+
 var frog, released, varXY, hit, hitObj;
+//メインループ
 function schedule(){
   var currentTime = ctx.currentTime - startTime;
-  var parent = document.getElementById('container');
   if(bgloop.ended === true){
     if(document.getElementsByClassName('released').length > 0){
       console.log("restart");
@@ -300,34 +319,37 @@ function schedule(){
       frog = document.getElementsByClassName('frog');
       hit = 0;
 			
-      var i, elm, obj, varX, varY;
+      var i, elm, obj;
       var inW = window.innerWidth, inH = window.innerHeight;
       //each method start
       for(i=0; i < len; i++){
         var current = i + Math.round(Math.random());
         elm = released[i], obj = $(elm);
-        var cl = elm.classList;
+        var level = elm.dataset.level;
 
-        varX = Math.floor((Math.random()-0.5)*400);
-        varY = Math.floor((Math.random()-0.5)*400);
+        var varX = Math.floor((Math.random() - 0.5) * movementRange);
+        var varY = Math.floor((Math.random() - 0.5) * movementRange);
         varXY = (Math.abs(varX) + Math.abs(varY)) * 1.5 + 100;
         
-        if(cl.contains(classLevel[classLevel.length-1])){
+        if(level == 10){
           varX = varX * 1.5 + 50;
           varY = varY * 1.5 + 50;
         }
         
         
         //画面外のオブジェクトの早期消去
-        if(parseFloat(elm.style.left) < 0 || inW < parseFloat(elm.style.left) || parseFloat(elm.style.top) < 0 || inH < parseFloat(elm.style.top)){
+        if(parseFloat(elm.style.left) < 0 ||
+        inW < parseFloat(elm.style.left) ||
+        parseFloat(elm.style.top) < 0 ||
+        inH < parseFloat(elm.style.top)){
           elm.style.opacity = elm.style.opacity - 0.1;
           console.log('out');
         }
 
-        // 生存判定        
+        // 生存判定
         var opc = parseFloat(elm.style.opacity);
         if(opc <= 0.05){
-          parent.removeChild(elm); //$.fn.remove の高速化
+          parent.removeChild(elm); //$.fn.remove よりも高速
           len--;
           i--;
           console.log("died..." + len);
@@ -338,18 +360,12 @@ function schedule(){
                 
         hitObj = obj.collision(frog).not(elm);
         if(hitObj.length > 0){
-          var j = classLevel.length-1;
-          if(cl.contains(classLevel[j]) === false){
-            for(j=0; j < classLevel.length-1; j++){
-              if(cl.contains(classLevel[j])){
-                cl.add(classLevel[j+1]);
-                cl.remove(classLevel[j]);
-                break;
-              }
-            }
-            if(j === classLevel.length-1){
-              j = false;
-              cl.add(classLevel[0]);
+          if(level != 10){
+            if(level === undefined){
+              elm.dataset.level = 0;
+            }else{
+              elm.dataset.level++;
+              level = Number(elm.dataset.level);
             }
           }else{
             console.log('final level');
@@ -359,10 +375,11 @@ function schedule(){
           elm.style.webkitAnimation = 'none';
           setTimeout(restartAnimation, 4/* + hit * hitInterval */, elm);
           
-          if(j === false){
+          if(level === undefined){
             playBass(hitInterval * hit);
           }else{
-            switch(j){
+            console.log('LEVEL', elm.dataset);
+            switch(level){
               case 0:
               playBass0(hitInterval * hit);
               break;
@@ -395,12 +412,6 @@ function schedule(){
               break;
               case 10:
               playBass10(hitInterval * hit);
-              break;
-            }
-          }
-          for(j=0; j < classLevel.length; j++){
-            if(cl.contains(classLevel[j])){
-              
               break;
             }
           }
@@ -445,8 +456,8 @@ function schedule(){
 
 function restartAnimation(elm){
   elm.style.webkitAnimation = '';
-  var parent = document.getElementById('container');
   
+  //波紋の描画
 	var ripple = document.createElement('div');
 	ripple.className = 'ripple';
 	ripple.style.width = varXY + 'px';
@@ -455,17 +466,8 @@ function restartAnimation(elm){
 	ripple.style.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
 	ripple.style.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
 	ripple.style.webkitAnimationDuration = hit * hitInterval + 's';
-	
-	/**
-  var ripple = "<div class='ripple' style='"
-  + "width:" + varXY + "px;"
-  + "height:" + varXY + "px;"
-  + "border-radius:" + varXY + "px;"
-  + "left:" + (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px;'
-  + "top: " + (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px;'
-  + "-webkit-animation-duration:" + hit * hitInterval + 's;'
-  + "'></div>";
-	**/
+
+  ripple.style.borderColor = colorOfLevel[elm.dataset.level];
 
   parent.insertBefore(ripple, parent.childNodes[0]);
 }
@@ -484,6 +486,103 @@ function createAnima(duration){
 	
   $(frog).animaMove(animaX - initX, animaY - initY, duration * 1000);
 
-  var parent = document.getElementById('container');
   parent.insertBefore(frog, parent.childNodes[0]);
 }
+
+//User Interface
+
+$(function(){
+  //ポーズボタン
+  
+  //ポーズボタンのクラスの入れ替え
+  function toggleControlClass(removeStr, addStr){
+    var elmClassList = document.getElementById('track-control-pause').classList;
+    elmClassList.remove(removeStr);
+    elmClassList.add(addStr);
+  }
+  
+  bgloop.addEventListener('play', function(){
+    toggleControlClass('icon-pause', 'icon-play');
+  }, false);
+  bgloop.addEventListener('pause', function(){
+    toggleControlClass('icon-play', 'icon-pause');
+  }, false);
+  bgloop.addEventListener('loadeddata', function(){
+    toggleControlClass('icon-play', 'icon-pause');
+  }, false);
+  
+  document.getElementById('track-control-pause').addEventListener('click', function(){
+     Mousetrap.trigger('space');
+  }, false);
+  
+  
+  //Store frequently elements in variables
+  var slider  = $(document.getElementsByClassName('slider'));
+  var sliderValues = [0,0]; // new Array(slider.length);
+
+
+  var tooltip = $(document.getElementsByClassName('tooltip'));
+  //Hide the Tooltip at first
+  tooltip.hide();
+
+
+  slider[0].volumeChange = function(intVal){
+    bgloop.volume = intVal * 0.01; // BGMの音量の設定(0.0 〜 1.0)
+  };
+  slider[1].volumeChange = function(intVal){
+    seVolume = intVal * 0.01; // BGMの音量の設定(0.0 〜 1.0)
+  };
+  
+  //Call the Slider
+  slider.each(function(index){
+    var maxValue = 100;
+        
+    $(this).slider({
+      //Config
+      range: 'min',
+      min: 0,
+      max: 100,
+      value: maxValue,
+
+      start: function(event, ui) {
+        //tooltip.fadeIn('fast');
+      },
+
+      //Slider Event
+      slide: function(event, ui){ //When the slider is sliding
+        sliderValues[index] = $(this).slider('value');
+        this.volumeChange(sliderValues[index]); //音量設定
+      
+        /*
+        tooltip
+        .css({
+          'left': value
+        })
+        .text(ui.value);  //Adjust the tooltip accordingly
+        */
+        
+        var volumeStyle = document.getElementsByClassName('icon_volume')[index].style;
+
+        if(sliderValues[index] <= maxValue * 0.05) {
+          volumeStyle.backgroundPositionY = '0';
+        }
+        else if (sliderValues[index] <= maxValue * 0.25) {
+          volumeStyle.backgroundPositionY = '-25px';
+        }
+        else if (sliderValues[index] <= maxValue * 0.75) {
+          volumeStyle.backgroundPositionY = '-50px';
+        }
+        else {
+          volumeStyle.backgroundPositionY = '-75px';
+        }
+      },
+
+      stop: function(event, ui){
+        console.log('Slider', sliderValues[index], $(this).slider('value'));
+        this.volumeChange($(this).slider('value')); //音量設定
+        //tooltip.fadeOut('fast');
+      }
+    });
+  }); // 'each' method END
+});
+

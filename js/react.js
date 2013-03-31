@@ -501,14 +501,17 @@ $(function(){
     elmClassList.add(addStr);
   }
   
-  bgloop.addEventListener('play', function(){
+  bgloop.addEventListener('pause', function(){
     toggleControlClass('icon-pause', 'icon-play');
   }, false);
-  bgloop.addEventListener('pause', function(){
+  bgloop.addEventListener('play', function(){
     toggleControlClass('icon-play', 'icon-pause');
   }, false);
   bgloop.addEventListener('loadeddata', function(){
-    toggleControlClass('icon-play', 'icon-pause');
+    toggleControlClass('icon-pause', 'icon-play');
+    
+    var footer = document.getElementsByTagName('footer')[0];
+    $(footer).animate({'bottom': 0}, 500);
   }, false);
   
   document.getElementById('track-control-pause').addEventListener('click', function(){

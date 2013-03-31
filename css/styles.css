@@ -240,7 +240,7 @@ html ::selection, body ::selection, #container ::selection, #frogLayer ::selecti
 /* line 34, ../scss/styles.scss */
 footer {
   position: fixed;
-  bottom: 0;
+  bottom: -150px;
   width: 100%;
   height: 120px;
   padding: 20px 20px 0 20px;

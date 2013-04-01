@@ -222,11 +222,6 @@ html ::selection, body ::selection, #container ::selection, #frogLayer ::selecti
 }
 
 /* line 20, ../scss/styles.scss */
-#container {
-  cursor: url(../img/cursor.png), crosshair;
-}
-
-/* line 24, ../scss/styles.scss */
 #welcome {
   display: none;
   position: fixed;
@@ -237,7 +232,7 @@ html ::selection, body ::selection, #container ::selection, #frogLayer ::selecti
   font-weight: bold;
 }
 
-/* line 34, ../scss/styles.scss */
+/* line 30, ../scss/styles.scss */
 footer {
   position: fixed;
   bottom: -150px;
@@ -247,7 +242,7 @@ footer {
   background: #0B0B0B;
 }
 
-/* line 46, ../scss/styles.scss */
+/* line 42, ../scss/styles.scss */
 .frog {
   position: absolute;
   opacity: 0;
@@ -259,23 +254,23 @@ footer {
 }
 
 @keyframes swell {
-  /* line 62, ../scss/styles.scss */
+  /* line 58, ../scss/styles.scss */
   0% {
     padding: 0;
   }
 
-  /* line 65, ../scss/styles.scss */
+  /* line 61, ../scss/styles.scss */
   50% {
     padding: 10px;
   }
 
-  /* line 68, ../scss/styles.scss */
+  /* line 64, ../scss/styles.scss */
   100% {
     padding: 0;
   }
 }
 
-/* line 73, ../scss/styles.scss */
+/* line 69, ../scss/styles.scss */
 .released {
   width: 33px;
   height: 93px;
@@ -288,26 +283,26 @@ footer {
 }
 
 @keyframes ripple {
-  /* line 86, ../scss/styles.scss */
+  /* line 82, ../scss/styles.scss */
   0% {
     opacity: 0;
     transform: scale(1);
   }
 
-  /* line 90, ../scss/styles.scss */
+  /* line 86, ../scss/styles.scss */
   45% {
     opacity: 0.2;
     transform: scale(0.8);
   }
 
-  /* line 95, ../scss/styles.scss */
+  /* line 91, ../scss/styles.scss */
   100% {
     opacity: 0.9;
     transform: scale(0);
   }
 }
 
-/* line 102, ../scss/styles.scss */
+/* line 98, ../scss/styles.scss */
 .ripple {
   animation-name: 'ripple';
   animation-duration: 0.542s;

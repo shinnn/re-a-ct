@@ -459,15 +459,18 @@ function restartAnimation(elm){
   
   //波紋の描画
 	var ripple = document.createElement('div');
+  var rippleStyle = ripple.style;
+  
 	ripple.className = 'ripple';
-	ripple.style.width = varXY + 'px';
-	ripple.style.height = varXY + 'px';
-	ripple.style.borderRadius = varXY + 'px';
-	ripple.style.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
-	ripple.style.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
-	ripple.style.webkitAnimationDuration = hit * hitInterval + 's';
+  
+	rippleStyle.width = varXY + 'px';
+	rippleStyle.height = varXY + 'px';
+	rippleStyle.borderRadius = varXY + 'px';
+	rippleStyle.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
+	rippleStyle.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
+	rippleStyle.webkitAnimationDuration = hit * hitInterval + 's';
 
-  ripple.style.borderColor = colorOfLevel[elm.dataset.level];
+  rippleStyle.borderColor = colorOfLevel[elm.dataset.level];
 
   parent.insertBefore(ripple, parent.childNodes[0]);
 }
@@ -507,11 +510,15 @@ $(function(){
   bgloop.addEventListener('play', function(){
     toggleControlClass('icon-play', 'icon-pause');
   }, false);
+  
   bgloop.addEventListener('loadeddata', function(){
     toggleControlClass('icon-pause', 'icon-play');
     
     var footer = document.getElementsByTagName('footer')[0];
     $(footer).animate({'bottom': 0}, 500);
+    
+    //カーソルの変更
+    parent.style.cursor = 'url(img/cursor.png), crosshair';
   }, false);
   
   document.getElementById('track-control-pause').addEventListener('click', function(){

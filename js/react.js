@@ -6,6 +6,7 @@
 var ctx;
 var panner;
 var bufferLoader;
+var myAudioAnalyser;
 
 var timeoutId = false;
 var noteTime = 0;
@@ -16,7 +17,7 @@ var createStart = false;
 var bgloop = new Audio('audio/background.wav');
 bgloop.autoplay = false;
 bgloop.loop = false;
-
+bgloop.restart = false; // Original
 
 var animaX = 0, animaY = 0;
 var initX = 0, initY = 0;
@@ -50,8 +51,12 @@ $(function(){
   }catch(e){
     alert('Web Audio API is not supported in this browser.\nPlease launch this site again with Google Chrome.');
   }
-  
+
   parent = document.getElementById('container');
+  
+  myAudioAnalyser = ctx.createAnalyser();
+  myAudioAnalyser.smoothingTimeConstant = 0.85;
+  myAudioAnalyser.connect(ctx.destination);
   
   var audioPath = [
     "beat.wav",
@@ -84,7 +89,7 @@ $(function(){
     panner = ctx.createPanner();
     panner.refDistance = 0.1;
     panner.rolloffFactor = 0.05;
-    panner.connect(ctx.destination);
+    panner.connect(myAudioAnalyser);
     panner.panningModel = 0;
     panner.distanceModel = 0;
 		
@@ -151,25 +156,25 @@ $(function(){
 	
   $.fn.animaMove = function(x, y, duration){
     var obj = $(this);
-    var animaTimer;
+    //var animaTimer;
     obj.animate({left: '+='+x, top: '+='+y, opacity: '1'}, interval, function(){
       //playPiano2();
       obj.animate({left: '-=100', top: '+=100'}, interval, function(){
         //playPiano2();
         obj.animate({left: '+=100', top: '+=100'}, interval);
-        obj.addClass('released');
+        this.classList.add('released');
       });
     });
   };
 
   //click にバインドするより操作性が高い
-  $(document.getElementById('container')).mousedown(function(e){
+  $(parent).mousedown(function(e){
     if(e.button !== 0){
       return;
     }
     
-    if(timeoutId === false){		
-			bgloop.play();        
+    if(timeoutId === false){
+			bgloop.play();
       startTime = ctx.currentTime - noteTime;
       schedule();
     }
@@ -273,7 +278,7 @@ function playSound(buffer, dest, timing){
   src.buffer.gain = seVolume;
   console.log(seVolume);
   src.loop = false;
-  src.connect(dest);
+  src.connect(myAudioAnalyser);
   src.start(ctx.currentTime + timing);
   //src.stop(ctx.currentTime + buffer.duration);
   return src;
@@ -290,32 +295,33 @@ var frog, released, varXY, hit, hitObj;
 //メインループ
 function schedule(){
   var currentTime = ctx.currentTime - startTime;
-  if(bgloop.ended === true){
+  if(bgloop.restart && bgloop.ended){
     if(document.getElementsByClassName('released').length > 0){
       console.log("restart");
       bgloop.play();
     }else{
-      //welcome
+      //welcome or click here
     }
   }
   while(noteTime <= currentTime){
     noteTime += (interval*0.0001);
-    if(time%5 === 0){
-      
+    drawSpectrum();
+
+    if(time%5 === 0){      
       if(createStart === true){
         panner.setPosition((animaX - window.innerWidth * 0.5) * 0.01, 0, 10);
         playPiano();
         createStart = false;
-      }
+      }      
     }
 
     if(time%10 === 0){
+      
       released = document.getElementsByClassName('released');
       var len = released.length;
       //参考 http://nanto.asablo.jp/blog/2006/02/21/262269
       //forループ外でlengthプロパティを呼び出し、パフォーマンス向上
 
-      $(released).css('opacity', '-=' + 0.000025 * len * len * len);
       frog = document.getElementsByClassName('frog');
       hit = 0;
 			
@@ -371,14 +377,13 @@ function schedule(){
             console.log('final level');
           }
           
-          elm.style.opacity = opc + 0.5; // opacity は 0 を超えないのでmax()は不要
+          elm.style.opacity = opc + 0.2 + 0.1 * (10 - level); // opacity は 0 を超えないのでmax()は不要
           elm.style.webkitAnimation = 'none';
           setTimeout(restartAnimation, 4/* + hit * hitInterval */, elm);
           
           if(level === undefined){
             playBass(hitInterval * hit);
           }else{
-            console.log('LEVEL', elm.dataset);
             switch(level){
               case 0:
               playBass0(hitInterval * hit);
@@ -418,12 +423,13 @@ function schedule(){
           hit++;
         }
         
+        // アニメーション
         if(Math.round(Math.random() + 0.3) === 1){
           obj.animate(
             {
               left: '+=' + varX,
               top: '+=' + varY,
-              //opacity: '-=' + 0.005 * len,
+              opacity: '-=' + 0.0000125 * Math.pow(len, 3),
               rotate: Math.atan2(varX, -varY) * 180 / Math.PI + 'deg'
             },
             interval - 1
@@ -492,14 +498,43 @@ function createAnima(duration){
   parent.insertBefore(frog, parent.childNodes[0]);
 }
 
+
+var canvas, canvasCtx, canvasWidth, canvasHeight, bar_width;
+
+$(function(){
+  canvas = document.getElementById('waveform');
+  canvasCtx = canvas.getContext('2d');
+  canvasWidth = canvas.width;
+  canvasHeight = canvas.height;
+  bar_width = 10;
+});
+
+function drawSpectrum(){
+  canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  var freqByteData = new Uint8Array(myAudioAnalyser.frequencyBinCount);
+  myAudioAnalyser.getByteFrequencyData(freqByteData);
+
+  var barCount = Math.round(canvasWidth / bar_width);
+  for (var i = 0; i < barCount; i++) {
+    var magnitude = freqByteData[i];
+    // some values need adjusting to fit on the canvas
+    canvasCtx.fillRect(bar_width * i, canvasHeight, bar_width - 2, -magnitude + 60);
+  }
+}
+
+
 //User Interface
 
 $(function(){
+  
+  
   //ポーズボタン
+  var controlPause = document.getElementById('track-control-pause');
   
   //ポーズボタンのクラスの入れ替え
   function toggleControlClass(removeStr, addStr){
-    var elmClassList = document.getElementById('track-control-pause').classList;
+    var elmClassList = controlPause.classList;
     elmClassList.remove(removeStr);
     elmClassList.add(addStr);
   }
@@ -521,14 +556,26 @@ $(function(){
     parent.style.cursor = 'url(img/cursor.png), crosshair';
   }, false);
   
-  document.getElementById('track-control-pause').addEventListener('click', function(){
+  controlPause.addEventListener('click', function(){
      Mousetrap.trigger('space');
+  }, false);
+  
+  //リピートボタン 
+  var controlRepeat = document.getElementById('track-control-repeat');
+  
+  controlRepeat.addEventListener('click', function(){
+    bgloop.restart = !bgloop.restart;
+    if(bgloop.restart){
+      controlRepeat.classList.remove('disabled');
+    }else{
+      controlRepeat.classList.add('disabled');
+    }
   }, false);
   
   
   //Store frequently elements in variables
-  var slider  = $(document.getElementsByClassName('slider'));
-  var sliderValues = [0,0]; // new Array(slider.length);
+  var slider  = $('#volume .slider');
+  var sliderValues = [0,0];
 
 
   var tooltip = $(document.getElementsByClassName('tooltip'));
@@ -559,8 +606,8 @@ $(function(){
       },
 
       //Slider Event
-      slide: function(event, ui){ //When the slider is sliding
-        sliderValues[index] = $(this).slider('value');
+      slide: function(event, ui){ // When the slider is sliding
+        sliderValues[index] = ui.value; // $(this).slider('value') とは値が微妙に異なることに注意
         this.volumeChange(sliderValues[index]); //音量設定
       
         /*
@@ -588,11 +635,96 @@ $(function(){
       },
 
       stop: function(event, ui){
-        console.log('Slider', sliderValues[index], $(this).slider('value'));
         this.volumeChange($(this).slider('value')); //音量設定
         //tooltip.fadeOut('fast');
       }
     });
   }); // 'each' method END
+  
+  var timeSlider = $('#time-control .slider');
+  var timeSliderMax = 500;
+
+  var playbackTimeoutID = null;
+
+  function finishSlide(){
+    if(playbackTimeoutID !== null){
+      clearTimeout(playbackTimeoutID);
+    }
+    playbackTimeoutID = setTimeout(function(){ updateTime(); }, 40);
+  }
+  
+  function updateTime(){
+    bgloop.currentTime = timeSlider.slider('value') / timeSliderMax * bgloop.duration;
+  }
+  
+  timeSlider.slider({
+    //Config
+    range: 'min',
+    min: 0,
+    max: timeSliderMax,
+    value: 0,
+
+    start: function(event, ui) {
+      //tooltip.fadeIn('fast');
+    },
+    
+    slide: function(event, ui){ //When the slider is sliding
+      bgloop.removeEventListener('timeupdate', bgTimeUpdate, false);
+      finishSlide();
+    },
+    
+    stop: function(){
+      bgloop.addEventListener('timeupdate', bgTimeUpdate, false);
+    }
+  });
+  
+  var counterNodes = document.getElementById('time-counter').children;
+  
+  var durationMMSS;
+  
+  // Get Duration
+  bgloop.addEventListener('loadeddata', function(){
+    var remainingMMSS = toHHMMSS(Math.floor(bgloop.duration - bgloop.currentTime), 1);
+    counterNodes[1].innerText = remainingMMSS;
+  }, false);
+
+  bgloop.addEventListener('timeupdate', bgTimeUpdate, false);
+
+  function bgTimeUpdate(){
+    timeSlider.slider('value', (bgloop.currentTime / bgloop.duration) * timeSliderMax);
+    
+    var currentMMSS = toHHMMSS(Math.floor(bgloop.currentTime), 1);
+    if(counterNodes[0].innerText !== currentMMSS){
+      counterNodes[0].innerText = currentMMSS;
+      
+      if(typeof bgloop.duration === 'number'){
+        var remainingMMSS = toHHMMSS(Math.floor(bgloop.duration - bgloop.currentTime), 1);
+        counterNodes[1].innerText = '- ' + remainingMMSS;
+      }
+    }
+  }
+  
+  // http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
+  function toHHMMSS(sec, divisionNumber){
+    sec_numb    = parseInt(sec, 10);
+    var hours   = Math.floor(sec_numb / 3600);
+    var minutes = Math.floor((sec_numb - (hours * 3600)) / 60);
+    var seconds = sec_numb - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+
+    var time = '';
+    if(divisionNumber === 2){
+      time = hours+':'+minutes+':'+seconds;
+    }else if(divisionNumber === 1){
+      time = minutes+':'+seconds;
+    }else{
+      time = seconds;
+    }
+    
+    return time;
+  }
 });
 

@@ -1,24 +1,63 @@
+#side-menu{
+	position: absolute;
+	top:0px;
+	width: 300px;
+	height: 100%;
+	background: none #EEEEEE;
+}
+
+#waveform{
+	width: 250px;
+	height: 250px;
+}
+
+.tracklist{
+	width: 250px;
+	list-style-type: none;
+	
+	& li{
+		height: 89px;
+		margin-bottom: 4px;
+		background: none #AAAAAA;
+	}
+}
+
 #track-control{
   float: left;
-  width: 50px;
-  height: 50px;
+  width: 250px;
+  height: 45px;
   margin: 0 0 0 0;
   color: white;
   font-family: 'player';
-  font-size: 40px;
   
   & div{
     float: left;
-    cursor: pointer;    
+    cursor: pointer;
+		margin-left: 18px;
   }
 }
 
-#track-control-pause{}
+#track-control-back, #track-control-next, #track-control-repeat{
+	width: 40px;
+  font-size: 40px;
+	line-height: 1.2em;
+	
+	&.disabled{
+		color: #666666;
+	}
+}
+
+#track-control-pause{
+	width: 36px;
+  font-size: 65px;
+	line-height: 0.75em;
+}
+
 
 // Volume Control
 
 #volume{
-  width: 150px;
+  width: 200px;
   height: 50px;
 	margin: 0px 0 0 0;
   float: left;
@@ -31,12 +70,50 @@
   float: none;
 	position: relative;
 }
+
+.info-text{
+	float: left;
+	color: white;
+}
+
+#time-control{
+  float: left;
+  width: 800px;
+  height: 100px;
+  margin: 0 0 0 0;
+  color: white;
+  font-family: 'player';
+  font-size: 30px;
+  
+  & div{
+    float: left;
+    cursor: pointer;    
+  }
+	
+	& section{
+		width: 600px;
+		height: 30px;
+		margin: 0 0 10px 0;
+	  float: left;
+		position: relative;
+		
+		& .slider{
+			width: 550px;
+		}
+	}
+}
+
+#time-counter{
+	float: left;
+	margin-top: -10px;
+}
+
 .slider{
 	border-width: 1px;
 	border-style: solid;
 	border-color: #333 #333 #777 #333;
 	border-radius: 25px;
-	width: 100px;
+	width: 110px;
 	position: absolute;
 	height: 13px;
 	background-color: #8e8d8d;
@@ -65,12 +142,12 @@
 }
 .icon_volume {
 	content: "";
-	display: inline-block;
+	position: absolute;
+	display: block;
 	width: 25px;
 	height: 25px;
-	right: -5px;
+	right: -15px;
 	background: url('../img/volume.png') no-repeat 0 -75px;
-	position: absolute;
 	margin-top: -5px;
 }
 .ui-slider-handle {

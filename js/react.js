@@ -5,6 +5,7 @@
 
 var ctx;
 var panner;
+var gain, gain2;
 var bufferLoader;
 var myAudioAnalyser;
 
@@ -13,11 +14,30 @@ var noteTime = 0;
 var startTime = 0;
 var createStart = false;
 
+var playlist = {};
+playlist.currentTrack = 0;
+
 //BGM
-var bgloop = new Audio('audio/background.wav');
+var bgloop = new Audio('audio/pad.wav');
 bgloop.autoplay = false;
 bgloop.loop = false;
 bgloop.restart = false; // Original
+
+var bgloopSource = {}; // tmp
+
+var bgloop1 = bgloop;
+
+var connectContext = function(source){
+  if(Object.prototype.toString.call(bgloopSource) !== "[object MediaElementAudioSourceNode]"){
+    bgloopSource = ctx.createMediaElementSource(source);
+  }
+  if('disconnect' in bgloopSource){
+    bgloopSource.disconnect(0);
+    console.log('disconnected');
+  }
+  bgloopSource.connect(myAudioAnalyser);
+  console.log(bgloopSource);
+};
 
 var animaX = 0, animaY = 0;
 var initX = 0, initY = 0;
@@ -46,6 +66,18 @@ var colorOfLevel = [
 ];
 
 $(function(){
+	var nativeCreateBufferSource = window.webkitAudioContext.prototype.createBufferSource;
+	window.webkitAudioContext.prototype.createBufferSource = function(){
+		var buf = this.nativeCreateBufferSource();
+
+		if(buf.start !== undefined && buf.noteOn){
+			buf.start = buf.noteOn;
+		}
+		if(buf.stop !== undefined && buf.noteOff){
+			buf.start = buf.noteOff;
+		}
+	};
+	
   try{
     ctx = new webkitAudioContext();
   }catch(e){
@@ -53,11 +85,7 @@ $(function(){
   }
 
   parent = document.getElementById('container');
-  
-  myAudioAnalyser = ctx.createAnalyser();
-  myAudioAnalyser.smoothingTimeConstant = 0.85;
-  myAudioAnalyser.connect(ctx.destination);
-  
+    
   var audioPath = [
     "beat.wav",
     "piano.wav",
@@ -86,13 +114,24 @@ $(function(){
 	function bufferLoaderCallback(){
     console.log("finish load.");
 		
+    gain2 = ctx.createGainNode();
+    gain2.gain.value = 0;
+    
+    gain = ctx.createGainNode();
+    gain.gain.value = 1;
+    gain.connect(ctx.destination);
+
     panner = ctx.createPanner();
     panner.refDistance = 0.1;
     panner.rolloffFactor = 0.05;
-    panner.connect(myAudioAnalyser);
+    panner.connect(ctx.destination);
     panner.panningModel = 0;
     panner.distanceModel = 0;
-		
+    
+    myAudioAnalyser = ctx.createAnalyser();
+    myAudioAnalyser.smoothingTimeConstant = 0.85;
+		myAudioAnalyser.connect(gain);
+    
     //SPACE key binding
     Mousetrap.bind('space', pauseBGloop);
     
@@ -134,7 +173,7 @@ $(function(){
     }
     
     Mousetrap.bind(['m', 'M'], toggleRectStyle);
-    Mousetrap.trigger(['m', 'M']);
+    //Mousetrap.trigger(['m', 'M']);
     
 		/*
     bgloop.addEventListener('ended', function(){
@@ -168,10 +207,15 @@ $(function(){
   };
 
   //click にバインドするより操作性が高い
+  
+  var mouseTimeoutID = null;
+   
   $(parent).mousedown(function(e){
     if(e.button !== 0){
       return;
     }
+    
+    //clearTimeout(mouseTimeoutID);
     
     if(timeoutId === false){
 			bgloop.play();
@@ -183,11 +227,18 @@ $(function(){
     animaX = e.clientX;
     animaY = e.clientY;
   });
+  
   /*
   $(document).mouseup(function(e){
-    createStart = false;
+    if(e.button !== 0){
+      return;
+    }
+    mouseTimeoutID = setTimeout(function(){
+      createStart = false;      
+    }, 150);
   });
   */
+  
 });
 
 function autoStop(){
@@ -278,7 +329,7 @@ function playSound(buffer, dest, timing){
   src.buffer.gain = seVolume;
   console.log(seVolume);
   src.loop = false;
-  src.connect(myAudioAnalyser);
+  src.connect(ctx.destination);
   src.start(ctx.currentTime + timing);
   //src.stop(ctx.currentTime + buffer.duration);
   return src;
@@ -292,25 +343,32 @@ var hitInterval = interval * 0.001 * 1/12 * 6;
 var movementRange = 500; //　一回の移動範囲
 
 var frog, released, varXY, hit, hitObj;
+
 //メインループ
 function schedule(){
   var currentTime = ctx.currentTime - startTime;
-  if(bgloop.restart && bgloop.ended){
-    if(document.getElementsByClassName('released').length > 0){
+  if(bgloop.ended){
+    if(bgloop.restart){
       console.log("restart");
-      bgloop.play();
     }else{
-      //welcome or click here
+      console.log("not restart");
+      goToTrack(1 - playlist.currentTrack); // 2トラックなので
     }
   }
   while(noteTime <= currentTime){
-    noteTime += (interval*0.0001);
-    drawSpectrum();
+    noteTime += (interval * 0.0001);
 
-    if(time%5 === 0){      
+    if(time%5 === 0){
+      if(playlist.currentTrack === 0){
+        drawSpectrum();
+        time++;
+        break;
+      }
+      
       if(createStart === true){
         panner.setPosition((animaX - window.innerWidth * 0.5) * 0.01, 0, 10);
         playPiano();
+        
         createStart = false;
       }      
     }
@@ -325,10 +383,10 @@ function schedule(){
       frog = document.getElementsByClassName('frog');
       hit = 0;
 			
-      var i, elm, obj;
+      var elm, obj;
       var inW = window.innerWidth, inH = window.innerHeight;
       //each method start
-      for(i=0; i < len; i++){
+      for(var i=0; i < len; i++){
         var current = i + Math.round(Math.random());
         elm = released[i], obj = $(elm);
         var level = elm.dataset.level;
@@ -377,7 +435,7 @@ function schedule(){
             console.log('final level');
           }
           
-          elm.style.opacity = opc + 0.2 + 0.1 * (10 - level); // opacity は 0 を超えないのでmax()は不要
+          elm.style.opacity = opc + 0.2 + (10 - level) * 0.1; // opacity は 0 を超えないのでmax()は不要
           elm.style.webkitAnimation = 'none';
           setTimeout(restartAnimation, 4/* + hit * hitInterval */, elm);
           
@@ -429,7 +487,7 @@ function schedule(){
             {
               left: '+=' + varX,
               top: '+=' + varY,
-              opacity: '-=' + 0.0000125 * Math.pow(len, 3),
+              opacity: '-=' + 0.0000055 * Math.pow(len, 3),
               rotate: Math.atan2(varX, -varY) * 180 / Math.PI + 'deg'
             },
             interval - 1
@@ -456,7 +514,7 @@ function schedule(){
     }
     
     time++;
-  }
+  } //while END
   timeoutId = setTimeout(function(){ schedule(); }, 4);
 }
 
@@ -510,25 +568,115 @@ $(function(){
 });
 
 function drawSpectrum(){
+  /*
   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
   var freqByteData = new Uint8Array(myAudioAnalyser.frequencyBinCount);
   myAudioAnalyser.getByteFrequencyData(freqByteData);
+  console.log(freqByteData);
 
   var barCount = Math.round(canvasWidth / bar_width);
-  for (var i = 0; i < barCount; i++) {
+  for (var i=0; i < barCount; i++) {
     var magnitude = freqByteData[i];
     // some values need adjusting to fit on the canvas
     canvasCtx.fillRect(bar_width * i, canvasHeight, bar_width - 2, -magnitude + 60);
   }
+  */
+
+  var centerHeight = $(parent).height() * 0.5 - 100;
+  
+  var frogs = document.getElementsByClassName('frog');
+  for(var i=0; i < frogs.length; i++){
+    var moveVal = (Math.random()-0.5) * 200;
+    if(centerHeight - parseFloat(frogs[i].style.top) > 0){
+      moveVal += 50;
+    }else{
+      moveVal -= 50;
+    }
+    if(Math.random() > 0.3){
+      $(frogs[i]).animate({
+        'top': '+=' + moveVal + 'px'
+      }, 300);
+    }
+  }
 }
 
+$(function(){
+  //goToTrack(0);
+});
+
+function goToTrack(trackNum){
+  if(trackNum === 0){
+    bgloop.src = 'audio/pad.wav';
+    
+    $(".ripple, .frog").fadeOut(
+      500,
+      function(){ $(this).remove(); }
+    );
+    
+    var centerHeight = $(parent).height() * 0.5;
+    var bar_width = 65;
+    var barCount = Math.round($(parent).width() / bar_width);
+    for(var i=6; i < barCount-2; i++){
+      var rain = document.createElement('div');
+      rain.className = 'frog released';
+      rain.style.opacity = '1';
+      rain.style.left = i * bar_width + 'px';
+      rain.style.top = centerHeight - 50 + 'px';
+      parent.appendChild(rain);
+    }
+    
+    parent.style.cursor = '';
+  }else if(trackNum === 1){
+    bgloop.src = 'audio/background.wav';
+
+    /*
+    $(".ripple, .frog, .rain").fadeOut(
+      500,
+      function(){ $(this).remove(); }
+    );
+    */
+    
+    $(".ripple, .frog, .rain").stop();
+    
+    //createAnima();
+
+    parent.style.cursor = 'url(img/cursor.png), crosshair';
+  }
+  
+  var tracklist = $('.tracklist li');
+  tracklist[trackNum].classList.add('chosen');
+  tracklist[1 - trackNum].classList.remove('chosen');
+  
+  if(bgloop.paused || playlist.currentTrack !== trackNum){
+    bgloop.play();
+  }else{
+    bgloop.pause();
+  }
+
+  playlist.currentTrack = trackNum;
+  console.log('track: ' + trackNum);
+}
 
 //User Interface
 
 $(function(){
   
-  
+  //トラック変更ボタン
+  var trackPanels = document.getElementsByClassName('tracklist')[0].children;
+
+  $(trackPanels).each(function(index){
+    trackPanels[index].addEventListener('click', function(){ goToTrack(index); }, false);
+  });
+
+  //
+  var controlBack = $('#track-control-back, #track-control-next');
+  controlBack
+  .click(function(){
+    goToTrack(1 - playlist.currentTrack);
+  })
+  .css('cursor', 'pointer');
+
   //ポーズボタン
   var controlPause = document.getElementById('track-control-pause');
   
@@ -545,17 +693,23 @@ $(function(){
   bgloop.addEventListener('play', function(){
     toggleControlClass('icon-play', 'icon-pause');
   }, false);
-  
+
+  var prevTrack = 0;
   bgloop.addEventListener('loadeddata', function(){
-    toggleControlClass('icon-pause', 'icon-play');
+    //if(prevTrack !== playlist.currentTrack){
+      toggleControlClass('icon-pause', 'icon-play');      
+      //}
+    //prevTrack = playlist.currentTrack;
     
     var footer = document.getElementsByTagName('footer')[0];
-    $(footer).animate({'bottom': 0}, 500);
-    
-    //カーソルの変更
-    parent.style.cursor = 'url(img/cursor.png), crosshair';
+    if(footer.style.bottom === ''){
+      $(footer).animate({'bottom': 0}, 500);
+      console.log('footer ready.');
+      
+      //connectContext(bgloop1);
+    }
   }, false);
-  
+    
   controlPause.addEventListener('click', function(){
      Mousetrap.trigger('space');
   }, false);
@@ -640,7 +794,7 @@ $(function(){
       }
     });
   }); // 'each' method END
-  
+    
   var timeSlider = $('#time-control .slider');
   var timeSliderMax = 500;
 
@@ -686,8 +840,9 @@ $(function(){
   bgloop.addEventListener('loadeddata', function(){
     var remainingMMSS = toHHMMSS(Math.floor(bgloop.duration - bgloop.currentTime), 1);
     counterNodes[1].innerText = remainingMMSS;
+    
   }, false);
-
+  
   bgloop.addEventListener('timeupdate', bgTimeUpdate, false);
 
   function bgTimeUpdate(){
@@ -726,5 +881,6 @@ $(function(){
     
     return time;
   }
+  
 });
 

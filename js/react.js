@@ -60,7 +60,7 @@ $(function(){
 		
 		return buf;
 	};
-	delete window.webkitAudioContext.prototype._createBufferSource;
+	//delete window.webkitAudioContext.prototype._createBufferSource;
 
   try{
     ctx = new webkitAudioContext();

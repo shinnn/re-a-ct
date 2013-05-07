@@ -46,8 +46,8 @@ var colorOfLevel = [
 ];
 
 $(function(){
-	window.webkitAudioContext.prototype.createBufferSource =
-	window.webkitAudioContext.prototype._createBufferSource;
+	window.webkitAudioContext.prototype._createBufferSource =
+	window.webkitAudioContext.prototype.createBufferSource;
 	window.webkitAudioContext.prototype.createBufferSource = function(){
 		var buf = this._createBufferSource();
 
@@ -60,7 +60,8 @@ $(function(){
 		
 		return buf;
 	};
-	//delete window.webkitAudioContext.prototype._createBufferSource;
+	delete window.webkitAudioContext.prototype._createBufferSource;
+
   try{
     ctx = new webkitAudioContext();
   }catch(e){

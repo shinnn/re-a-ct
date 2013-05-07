@@ -56,6 +56,8 @@ $(function(){
 	if(buf.stop !== undefined && buf.noteOff){
 		buf.start = buf.noteOff;
 	}
+			return buf;
+
 	};
   try{
     ctx = new webkitAudioContext();

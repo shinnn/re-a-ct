@@ -46,6 +46,17 @@ var colorOfLevel = [
 ];
 
 $(function(){
+	var nativeCreateBufferSource = window.webkitAudioContext.prototype.createBufferSource;
+	window.webkitAudioContext.prototype.createBufferSource = function(){
+	var buf = this.nativeCreateBufferSource();
+
+	if(buf.start !== undefined && buf.noteOn){
+		buf.start = buf.noteOn;
+	}
+	if(buf.stop !== undefined && buf.noteOff){
+		buf.start = buf.noteOff;
+	}
+	};
   try{
     ctx = new webkitAudioContext();
   }catch(e){

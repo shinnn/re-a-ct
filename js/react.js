@@ -51,10 +51,10 @@ $(function(){
 	window.webkitAudioContext.prototype.createBufferSource = function(){
 		var buf = this._createBufferSource();
 
-		if(buf.start !== undefined && buf.noteOn){
+		if(buf.start === undefined && buf.noteOn){
 			buf.start = buf.noteOn;
 		}
-		if(buf.stop !== undefined && buf.noteOff){
+		if(buf.stop === undefined && buf.noteOff){
 			buf.start = buf.noteOff;
 		}
 		

@@ -3,6 +3,46 @@
  * https://github.com/shinnn
 */
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+(function supportAlternateNames(){
+  var tmpctx = new AudioContext();
+  console.log(tmpctx.createBufferSource().constructor.prototype);
+  
+  var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
+  var bufSourceProto = tmpctx.createBufferSource().constructor.prototype;
+  
+  var isStillOld = function(normative, old){
+    return bufSourceProto[normative] === undefined && bufSourceProto[old] !== undefined; 
+  };
+
+  if(isStillOld('start', 'noteOn') || isStillOld('start', 'noteOn')){
+    AudioContext.prototype.createBufferSource = function createBufferSource(){
+      var buf = nativeCreateBufferSource.call(this);
+        buf.start = buf.noteOn;
+        buf.stop = buf.stop || buf.noteOff;
+          
+      return buf;
+    };
+  }
+    
+  if(AudioContext.prototype.createGain === undefined &&
+  AudioContext.prototype.createGainNode !== undefined){
+    AudioContext.prototype.createGain = AudioContext.prototype.createGainNode;
+  }
+
+  if(AudioContext.prototype.createDelay === undefined &&
+  AudioContext.prototype.createDelayNode !== undefined){
+    AudioContext.prototype.createDelay = AudioContext.prototype.createGainNode;
+  }
+  
+  if(AudioContext.prototype.createScriptProcessor === undefined &&
+  AudioContext.prototype.createJavaScriptNode !== undefined){
+    AudioContext.prototype.createScriptProcessor = AudioContext.prototype.createJavaScriptNode;
+  }
+  
+}());
+
 var ctx;
 var panner;
 var bufferLoader;
@@ -14,7 +54,7 @@ var startTime = 0;
 var createStart = false;
 
 //BGM
-var bgloop = new Audio('audio/background.wav');
+var bgloop = new Audio('audio/wav/background.wav');
 bgloop.autoplay = false;
 bgloop.loop = false;
 bgloop.restart = false; // Original
@@ -46,24 +86,8 @@ var colorOfLevel = [
 ];
 
 $(function(){
-	window.webkitAudioContext.prototype._createBufferSource =
-	window.webkitAudioContext.prototype.createBufferSource;
-	window.webkitAudioContext.prototype.createBufferSource = function(){
-		var buf = this._createBufferSource();
-
-		if(buf.start === undefined && buf.noteOn){
-			buf.start = buf.noteOn;
-		}
-		if(buf.stop === undefined && buf.noteOff){
-			buf.start = buf.noteOff;
-		}
-		
-		return buf;
-	};
-	//delete window.webkitAudioContext.prototype._createBufferSource;
-
   try{
-    ctx = new webkitAudioContext();
+    ctx = new AudioContext();
   }catch(e){
     alert('Web Audio API is not supported in this browser.\nPlease launch this site again with Google Chrome.');
   }
@@ -74,41 +98,47 @@ $(function(){
   myAudioAnalyser.smoothingTimeConstant = 0.85;
   myAudioAnalyser.connect(ctx.destination);
   
+  var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
+  navigator.userAgent.indexOf('Android') !== -1);
+  
+  var ext = isMobile? 'wav': 'wav'; //tmp
+  
   var audioPath = [
-    "beat.wav",
-    "piano.wav",
-    "piano2.wav",
-    "pad.wav",
-    "beat0.wav",
-    "beat1.wav",
-    "beat2.wav",
-    "beat3.wav",
-    "beat4.wav",
-    "beat5.wav",
-    "beat6.wav",
-    "beat7.wav",
-    "beat8.wav",
-    "beat9.wav",
-    "beat10.wav"
+    "beat",
+    "piano",
+    "piano2",
+    "pad",
+    "beat0",
+    "beat1",
+    "beat2",
+    "beat3",
+    "beat4",
+    "beat5",
+    "beat6",
+    "beat7",
+    "beat8",
+    "beat9",
+    "beat10"
   ];
-	
+  
   for(i=0; i < audioPath.length; i++){
-    audioPath[i] = "audio/" + audioPath[i];
+    audioPath[i] = 'audio/' + ext + '/' + audioPath[i] + '.' + ext;
+    
   }
-	
+  
   //Load Audio Files
   bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
-	
-	function bufferLoaderCallback(){
+  
+  function bufferLoaderCallback(){
     console.log("finish load.");
-		
+    
     panner = ctx.createPanner();
     panner.refDistance = 0.1;
     panner.rolloffFactor = 0.05;
     panner.connect(myAudioAnalyser);
     panner.panningModel = 0;
     panner.distanceModel = 0;
-		
+    
     //SPACE key binding
     Mousetrap.bind('space', pauseBGloop);
     
@@ -133,7 +163,7 @@ $(function(){
     ss.href = 'css/rect.css';
     ss.rel = 'stylesheet';
     ss.media = 'screen';
-		
+    
     function toggleRectStyle(){
       var head = document.getElementsByTagName('head')[0];
       var sheets = head.getElementsByTagName('link');
@@ -152,7 +182,7 @@ $(function(){
     Mousetrap.bind(['m', 'M'], toggleRectStyle);
     Mousetrap.trigger(['m', 'M']);
     
-		/*
+    /*
     bgloop.addEventListener('ended', function(){
       //console.log("end at " + ctx.currentTime);
       //clearTimeout(timeoutId);
@@ -167,9 +197,9 @@ $(function(){
     });
     */
   }
-	
+  
   bufferLoader.load();
-	
+  
   $.fn.animaMove = function(x, y, duration){
     var obj = $(this);
     //var animaTimer;
@@ -190,7 +220,7 @@ $(function(){
     }
     
     if(timeoutId === false){
-			bgloop.play();
+      bgloop.play();
       startTime = ctx.currentTime - noteTime;
       schedule();
     }
@@ -283,7 +313,7 @@ function playPiano2(timing){
 }
 
 function playPad(panX){
-  //	panner.setPosition(panX,2,2);
+  //  panner.setPosition(panX,2,2);
   //source[3] = playSound(bufferLoader.bufferList[3], ctx.destination, 0);
   //source[3].buffer.gain = 0.02;
 }
@@ -292,10 +322,11 @@ function playSound(buffer, dest, timing){
   var src = ctx.createBufferSource();
   src.buffer = buffer;
   src.buffer.gain = seVolume;
-  console.log(seVolume);
+  console.log(seVolume, ctx.currentTime + timing);
   src.loop = false;
   src.connect(myAudioAnalyser);
   src.start(ctx.currentTime + timing);
+  //src.noteOn(ctx.currentTime + timing);
   //src.stop(ctx.currentTime + buffer.duration);
   return src;
 }
@@ -340,7 +371,7 @@ function schedule(){
 
       frog = document.getElementsByClassName('frog');
       hit = 0;
-			
+      
       var i, elm, obj;
       var inW = window.innerWidth, inH = window.innerHeight;
       //each method start
@@ -480,17 +511,17 @@ function restartAnimation(elm){
   elm.style.webkitAnimation = '';
   
   //波紋の描画
-	var ripple = document.createElement('div');
+  var ripple = document.createElement('div');
   var rippleStyle = ripple.style;
   
-	ripple.className = 'ripple';
+  ripple.className = 'ripple';
   
-	rippleStyle.width = varXY + 'px';
-	rippleStyle.height = varXY + 'px';
-	rippleStyle.borderRadius = varXY + 'px';
-	rippleStyle.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
-	rippleStyle.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
-	rippleStyle.webkitAnimationDuration = hit * hitInterval + 's';
+  rippleStyle.width = varXY + 'px';
+  rippleStyle.height = varXY + 'px';
+  rippleStyle.borderRadius = varXY + 'px';
+  rippleStyle.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
+  rippleStyle.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
+  rippleStyle.webkitAnimationDuration = hit * hitInterval + 's';
 
   rippleStyle.borderColor = colorOfLevel[elm.dataset.level];
 
@@ -502,13 +533,13 @@ function restartAnimation(elm){
 function createAnima(duration){
   initX = Math.floor(Math.random() * window.innerWidth);
   initY = Math.random() < 0.5? -30: window.innerHeight;
-	
-	var frog = document.createElement('div');
-	frog.className = 'frog';
-	frog.innerText = 'o o'; //眼の描画
-	frog.style.left = initX + 'px';
-	frog.style.top = initY + 'px';
-	
+  
+  var frog = document.createElement('div');
+  frog.className = 'frog';
+  frog.innerText = 'o o'; //眼の描画
+  frog.style.left = initX + 'px';
+  frog.style.top = initY + 'px';
+  
   $(frog).animaMove(animaX - initX, animaY - initY, duration * 1000);
 
   parent.insertBefore(frog, parent.childNodes[0]);
@@ -594,9 +625,7 @@ $(function(){
   var sliderValues = [0,0];
 
 
-  var tooltip = $(document.getElementsByClassName('tooltip'));
-  //Hide the Tooltip at first
-  tooltip.hide();
+  var tooltip = $(document.getElementsByClassName('tooltip')); //Hide the Tooltip at first tooltip.hide();
 
 
   slider[0].volumeChange = function(intVal){

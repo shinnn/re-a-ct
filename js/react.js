@@ -6,9 +6,7 @@
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 (function supportAlternateNames(){
-  var tmpctx = new AudioContext();
-  console.log(tmpctx.createBufferSource().constructor.prototype);
-  
+  var tmpctx = new AudioContext();  
   var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
   var bufSourceProto = tmpctx.createBufferSource().constructor.prototype;
   
@@ -98,31 +96,51 @@ $(function(){
   myAudioAnalyser.smoothingTimeConstant = 0.85;
   myAudioAnalyser.connect(ctx.destination);
   
+  function audioPlayTypeSupported(type, codec){
+    return !! document.createElement('audio').canPlayType(
+      'audio/' + type + (codec? '; codecs=' + codec: '')
+    );
+    
+    //if(str === 'probably'){ return 2; }
+    //if(str === 'maybe'){ return 1; }
+    //return 0;
+  }
+  
   var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
   navigator.userAgent.indexOf('Android') !== -1);
   
-  var ext = isMobile? 'wav': 'wav'; //tmp
-  
+  var fileNameExt, fileBitRate = '';
+	
+  if(isMobile){
+    if(audioPlayTypeSupported('mp4', 'mp4a.40.5')){
+      fileNameExt = 'm4a';
+      fileBitRate = 128;
+    }
+  }else{
+    fileNameExt = 'wav';
+  }
+  console.log(fileNameExt + ' mode');
+	
   var audioPath = [
-    "beat",
-    "piano",
-    "piano2",
-    "pad",
-    "beat0",
-    "beat1",
-    "beat2",
-    "beat3",
-    "beat4",
-    "beat5",
-    "beat6",
-    "beat7",
-    "beat8",
-    "beat9",
-    "beat10"
+  "beat",
+  "piano",
+  "piano2",
+  "pad",
+  "beat0",
+  "beat1",
+  "beat2",
+  "beat3",
+  "beat4",
+  "beat5",
+  "beat6",
+  "beat7",
+  "beat8",
+  "beat9",
+  "beat10"
   ];
   
   for(i=0; i < audioPath.length; i++){
-    audioPath[i] = 'audio/' + ext + '/' + audioPath[i] + '.' + ext;
+    audioPath[i] = 'audio/' + fileNameExt + fileBitRate + '/' + audioPath[i] + '.' + fileNameExt;
     
   }
   
@@ -184,16 +202,16 @@ $(function(){
     
     /*
     bgloop.addEventListener('ended', function(){
-      //console.log("end at " + ctx.currentTime);
-      //clearTimeout(timeoutId);
-      bgloop.currentTime = 0;
-      //bgloop.play();
+    //console.log("end at " + ctx.currentTime);
+    //clearTimeout(timeoutId);
+    bgloop.currentTime = 0;
+    //bgloop.play();
     });
 
     bgloop.addEventListener('playing', function(){
-      console.log("start at " + ctx.currentTime);
-      startTime = ctx.currentTime - noteTime;
-      schedule();
+    console.log("start at " + ctx.currentTime);
+    startTime = ctx.currentTime - noteTime;
+    schedule();
     });
     */
   }

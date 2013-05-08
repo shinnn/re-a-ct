@@ -52,7 +52,7 @@ var startTime = 0;
 var createStart = false;
 
 //BGM
-var bgloop = new Audio('audio/wav/background.wav');
+var bgloop = new Audio();
 bgloop.autoplay = false;
 bgloop.loop = false;
 bgloop.restart = false; // Original
@@ -84,27 +84,7 @@ var colorOfLevel = [
 ];
 
 $(function(){
-  try{
-    ctx = new AudioContext();
-  }catch(e){
-    alert('Web Audio API is not supported in this browser.\nPlease launch this site again with Google Chrome.');
-  }
-
   parent = document.getElementById('container');
-  
-  myAudioAnalyser = ctx.createAnalyser();
-  myAudioAnalyser.smoothingTimeConstant = 0.85;
-  myAudioAnalyser.connect(ctx.destination);
-  
-  function audioPlayTypeSupported(type, codec){
-    return !! document.createElement('audio').canPlayType(
-      'audio/' + type + (codec? '; codecs=' + codec: '')
-    );
-    
-    //if(str === 'probably'){ return 2; }
-    //if(str === 'maybe'){ return 1; }
-    //return 0;
-  }
   
   var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
   navigator.userAgent.indexOf('Android') !== -1);
@@ -120,7 +100,7 @@ $(function(){
     fileNameExt = 'wav';
   }
   console.log(fileNameExt + ' mode');
-	
+  
   var audioPath = [
   "beat",
   "piano",
@@ -139,85 +119,146 @@ $(function(){
   "beat10"
   ];
   
+  bgloop.src = 'audio/' + fileNameExt + fileBitRate + '/' + 'background' + '.' + fileNameExt;
+  
   for(i=0; i < audioPath.length; i++){
     audioPath[i] = 'audio/' + fileNameExt + fileBitRate + '/' + audioPath[i] + '.' + fileNameExt;
-    
   }
   
-  //Load Audio Files
-  bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
-  
-  function bufferLoaderCallback(){
-    console.log("finish load.");
-    
-    panner = ctx.createPanner();
-    panner.refDistance = 0.1;
-    panner.rolloffFactor = 0.05;
-    panner.connect(myAudioAnalyser);
-    panner.panningModel = 0;
-    panner.distanceModel = 0;
-    
-    //SPACE key binding
-    Mousetrap.bind('space', pauseBGloop);
-    
-    function pauseBGloop(e){
-      if(e){
-        e.preventDefault();
-      }
-      if(timeoutId === false){
-        bgloop.play();
-        startTime = ctx.currentTime - noteTime;
-        schedule();
-      }else{
-        bgloop.pause();
-        clearTimeout(timeoutId);
-        timeoutId = false;
-      }
+  var audioContextSetup = function(){
+    try{
+      ctx = new AudioContext();
+    }catch(e){
+      alert('Web Audio API is not supported in this browser.\nPlease launch this site again with Google Chrome.');
     }
-    
-    //m key binding
-    // http://yuiblog.com/blog/2008/07/22/non-blocking-scripts/
-    var ss = document.createElement('link');
-    ss.href = 'css/rect.css';
-    ss.rel = 'stylesheet';
-    ss.media = 'screen';
-    
-    function toggleRectStyle(){
-      var head = document.getElementsByTagName('head')[0];
-      var sheets = head.getElementsByTagName('link');
       
-      if(sheets[sheets.length-1] === ss){
-        head.removeChild(ss);
-        console.log('remove style');
+    myAudioAnalyser = ctx.createAnalyser();
+    myAudioAnalyser.smoothingTimeConstant = 0.85;
+    myAudioAnalyser.connect(ctx.destination);
+    console.log(myAudioAnalyser, ctx.destination);
+    
+    //Load Audio Files
+    bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
+  
+    function bufferLoaderCallback(){
+      console.log("finish load.");
+    
+      panner = ctx.createPanner();
+      panner.refDistance = 0.1;
+      panner.rolloffFactor = 0.05;
+      panner.connect(myAudioAnalyser);
+      panner.panningModel = 0;
+      panner.distanceModel = 0;
+      
+      //click にバインドするより操作性が高い
+      var pointingEvent;
+      if(parent.onmousedown !== undefined){
+        pointingEvent = 'mousedown';
+      }else if(parent.ontouchstart !== undefined){
+        pointingEvent = 'touchstart';    
       }else{
-        // http://www.softel.co.jp/blogs/tech/archives/994
-        head.insertBefore(ss, head.getElementsByTagName('script')[0]);
-        console.log('append style');
+        pointingEvent = 'click';
       }
-      //document.getElementsByTagName('head')[0].appendChild(ss);
-    }
-    
-    Mousetrap.bind(['m', 'M'], toggleRectStyle);
-    Mousetrap.trigger(['m', 'M']);
-    
-    /*
-    bgloop.addEventListener('ended', function(){
-    //console.log("end at " + ctx.currentTime);
-    //clearTimeout(timeoutId);
-    bgloop.currentTime = 0;
-    //bgloop.play();
-    });
 
-    bgloop.addEventListener('playing', function(){
-    console.log("start at " + ctx.currentTime);
-    startTime = ctx.currentTime - noteTime;
-    schedule();
-    });
-    */
+      $(parent).on(
+        pointingEvent,
+        null, function(e){
+        if(e.button !== 0){
+          return;
+        }
+    
+        if(timeoutId === false){
+          bgloop.play();
+          startTime = ctx.currentTime - noteTime;
+          schedule();
+          console.log('ppp');
+        }
+    
+        createStart = true;
+        animaX = e.pageX;
+        animaY = e.pageY;
+      });
+    
+      //SPACE key binding
+      Mousetrap.bind('space', pauseBGloop);
+    
+      function pauseBGloop(e){
+        if(e){
+          e.preventDefault();
+        }
+        if(timeoutId === false){
+          bgloop.play();
+          startTime = ctx.currentTime - noteTime;
+          schedule();
+        }else{
+          bgloop.pause();
+          clearTimeout(timeoutId);
+          timeoutId = false;
+        }
+      }
+    
+      //m key binding
+      // http://yuiblog.com/blog/2008/07/22/non-blocking-scripts/
+      var ss = document.createElement('link');
+      ss.href = 'css/rect.css';
+      ss.rel = 'stylesheet';
+      ss.media = 'screen';
+    
+      function toggleRectStyle(){
+        var head = document.getElementsByTagName('head')[0];
+        var sheets = head.getElementsByTagName('link');
+      
+        if(sheets[sheets.length-1] === ss){
+          head.removeChild(ss);
+          console.log('remove style');
+        }else{
+          // http://www.softel.co.jp/blogs/tech/archives/994
+          head.insertBefore(ss, head.getElementsByTagName('script')[0]);
+          console.log('append style');
+        }
+        //document.getElementsByTagName('head')[0].appendChild(ss);
+      }
+    
+      Mousetrap.bind(['m', 'M'], toggleRectStyle);
+      Mousetrap.trigger(['m', 'M']);
+    
+      /*
+      bgloop.addEventListener('ended', function(){
+      //console.log("end at " + ctx.currentTime);
+      //clearTimeout(timeoutId);
+      bgloop.currentTime = 0;
+      //bgloop.play();
+      });
+
+      bgloop.addEventListener('playing', function(){
+      console.log("start at " + ctx.currentTime);
+      startTime = ctx.currentTime - noteTime;
+      schedule();
+      });
+      */
+      playBass(0);
+    }
+  
+    bufferLoader.load();
+    $(parent).off('touchstart', null, audioContextSetup);
+  };
+  
+  if(parent.ontouchstart !== undefined){
+    $(parent).on('touchstart', null, audioContextSetup);
+  }else{
+    audioContextSetup();
   }
   
-  bufferLoader.load();
-  
+  function audioPlayTypeSupported(type, codec){
+    return !! document.createElement('audio').canPlayType(
+      'audio/' + type + (codec? '; codecs=' + codec: '')
+    );
+    
+    //if(str === 'probably'){ return 2; }
+    //if(str === 'maybe'){ return 1; }
+    //return 0;
+  }
+    
   $.fn.animaMove = function(x, y, duration){
     var obj = $(this);
     //var animaTimer;
@@ -231,22 +272,6 @@ $(function(){
     });
   };
 
-  //click にバインドするより操作性が高い
-  $(parent).mousedown(function(e){
-    if(e.button !== 0){
-      return;
-    }
-    
-    if(timeoutId === false){
-      bgloop.play();
-      startTime = ctx.currentTime - noteTime;
-      schedule();
-    }
-    
-    createStart = true;
-    animaX = e.clientX;
-    animaY = e.clientY;
-  });
   /*
   $(document).mouseup(function(e){
     createStart = false;
@@ -342,8 +367,8 @@ function playSound(buffer, dest, timing){
   src.buffer.gain = seVolume;
   console.log(seVolume, ctx.currentTime + timing);
   src.loop = false;
-  src.connect(myAudioAnalyser);
-  src.start(ctx.currentTime + timing);
+  src.connect(ctx.destination);//myAudioAnalyser);
+  src.noteOn(ctx.currentTime + timing);
   //src.noteOn(ctx.currentTime + timing);
   //src.stop(ctx.currentTime + buffer.duration);
   return src;
@@ -370,7 +395,8 @@ function schedule(){
   }
   while(noteTime <= currentTime){
     noteTime += (interval*0.0001);
-    drawSpectrum();
+    console.log(noteTime, currentTime);
+    //drawSpectrum();
 
     if(time%5 === 0){      
       if(createStart === true){
@@ -501,7 +527,7 @@ function schedule(){
           );
         }
                 
-        playPad(/* (off.left-$(document).width()*0.5)*0.01 + 5 */);
+        //playPad(/* (off.left-$(document).width()*0.5)*0.01 + 5 */);
       }
       $(".ripple:gt(" + (len*2 <= 15? len*2: 15) + ")").remove();
       
@@ -625,7 +651,7 @@ $(function(){
      Mousetrap.trigger('space');
   }, false);
   
-  //リピートボタン 
+  //リピートボタン
   var controlRepeat = document.getElementById('track-control-repeat');
   
   controlRepeat.addEventListener('click', function(){

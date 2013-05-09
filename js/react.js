@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2012-2013 Shinnosuke Watanabe
- * https://github.com/shinnn
+ * github.com/shinnn
 */
 
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
+this.AudioContext = this.AudioContext || this.webkitAudioContext;
 
 (function supportAlternateNames(){
   var tmpctx = new AudioContext();  
@@ -53,9 +53,6 @@ var createStart = false;
 
 //BGM
 var bgloop = new Audio();
-bgloop.autoplay = false;
-bgloop.loop = false;
-bgloop.restart = false; // Original
 
 var animaX = 0, animaY = 0;
 var initX = 0, initY = 0;
@@ -130,17 +127,24 @@ $(function(){
   "beat10"
   ];
   
-  var preffix = 'audio/' + fileFormat + fileBitRate + '/';
+  var preffix = './audio/' + fileFormat + fileBitRate + '/';
   var suffix = isMobile? '.js': '.' + fileFormat;
-  
-  bgloop.src = preffix + 'background' + '.' + fileFormat;
-  
+    
   for(var i=0; i < audioPath.length; i++){
     audioPath[i] = preffix + base64 + audioPath[i] + suffix;
   }
   
-  if(isMobile && parent.ontouchstart !== undefined){
-    $(parent).on('touchstart', null, audioContextSetup);
+  var pointingEvent;
+  if(parent.ontouchstart !== undefined){
+    pointingEvent = 'touchstart';
+  }else if(parent.onmousedown !== undefined){
+    pointingEvent = 'mousedown';
+  }else{
+    pointingEvent = 'click';
+  }
+  
+  if(isMobile/* && parent.ontouchstart !== undefined*/){
+    $(parent).on(pointingEvent, null, audioContextSetup);
   }else{
     audioContextSetup();
   }
@@ -152,6 +156,11 @@ $(function(){
       alert('Web Audio API is not supported in this browser.\n' +
       'Please launch this site again with Google Chrome.');
     }
+    
+    bgloop.src = preffix + 'background' + '.' + fileFormat;
+    bgloop.autoplay = false;
+    bgloop.loop = false;
+    bgloop.restart = true; // Original
     
     analyzer = ctx.createAnalyser();
     analyzer.smoothingTimeConstant = 0.85;
@@ -168,24 +177,16 @@ $(function(){
     bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
     bufferLoader[isMobile? 'loadDataURL': 'load']();
     
-    $(parent).off('touchstart', null, audioContextSetup);
+    $(parent).off(pointingEvent, null, audioContextSetup);
+    
   }
   
   function bufferLoaderCallback(){
     console.log("finish load.");
-          
+    
     //click にバインドするより操作性が高い
-    var pointingEvent;
-    if(parent.onmousedown !== undefined){
-      pointingEvent = 'mousedown';
-    }else if(parent.ontouchstart !== undefined){
-      pointingEvent = 'touchstart';    
-    }else{
-      pointingEvent = 'click';
-    }
-
     $(parent).on(pointingEvent, null, function(e){
-      if(e.button !== 0){
+      if(e.button !== undefined && e.button !== 0){
         return;
       }
   
@@ -193,12 +194,13 @@ $(function(){
         bgloop.play();
         startTime = ctx.currentTime - noteTime;
         schedule();
-        console.log(pointingEvent + ' fired.');
       }
   
       createStart = true;
-      animaX = e.pageX;
-      animaY = e.pageY;
+      animaX = e.pageX || e.originalEvent.pageX;
+      animaY = e.pageY || e.originalEvent.pageY;
+
+      console.log(pointingEvent + ' fired.');
     });
   
     //SPACE key binding
@@ -217,7 +219,14 @@ $(function(){
       }
     });
     
-    // playBass(0);
+    ctx.decodeAudioData(Base64Binary.decodeArrayBuffer(sound), function(audioData) {
+      myBuffer = audioData;
+      mySource = ctx.createBufferSource();
+      mySource.buffer = myBuffer;
+      mySource.connect(ctx.destination);
+      mySource.noteOn(0.01);
+      mySource.noteOff(0.05);      
+    });
   }
   
   //m key binding
@@ -330,7 +339,7 @@ function playSound(buffer, dest, timing){
   src.buffer.gain = seVolume;
   src.loop = false;
   src.connect(analyzer);
-  src.start(ctx.currentTime + timing);
+  src.noteOn(ctx.currentTime + timing);
   //src.noteOn(ctx.currentTime + timing);
   //src.stop(ctx.currentTime + buffer.duration);
   return src;

@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/* line 1, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 1, ../scss/_interface.scss */
 #side-menu {
   position: absolute;
   top: 0px;
@@ -8,67 +8,67 @@
   background: none #EEEEEE;
 }
 
-/* line 9, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 9, ../scss/_interface.scss */
 #waveform {
   width: 250px;
   height: 250px;
 }
 
-/* line 14, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 14, ../scss/_interface.scss */
 .tracklist {
   width: 250px;
   list-style-type: none;
 }
-/* line 18, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 18, ../scss/_interface.scss */
 .tracklist li {
   height: 89px;
   margin-bottom: 4px;
   background: none #AAAAAA;
 }
 
-/* line 25, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 25, ../scss/_interface.scss */
 #track-control {
   float: left;
   width: 250px;
-  height: 45px;
+  height: 85px;
   margin: 0 0 0 0;
   color: white;
   font-family: 'player';
 }
-/* line 33, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 33, ../scss/_interface.scss */
 #track-control div {
   float: left;
   cursor: pointer;
   margin-left: 18px;
 }
 
-/* line 40, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 40, ../scss/_interface.scss */
 #track-control-back, #track-control-next, #track-control-repeat {
   width: 40px;
   font-size: 40px;
   line-height: 1.2em;
 }
-/* line 45, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 45, ../scss/_interface.scss */
 #track-control-back.disabled, #track-control-next.disabled, #track-control-repeat.disabled {
   color: #666666;
 }
 
-/* line 50, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 50, ../scss/_interface.scss */
 #track-control-pause {
   width: 36px;
   font-size: 65px;
   line-height: 0.75em;
 }
 
-/* line 59, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 59, ../scss/_interface.scss */
 #volume {
   width: 200px;
-  height: 50px;
+  height: 85px;
   margin: 0px 0 0 0;
   float: left;
 }
 
-/* line 66, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 66, ../scss/_interface.scss */
 #bg_volume, #se_volume {
   width: 150px;
   height: 20px;
@@ -77,13 +77,13 @@
   position: relative;
 }
 
-/* line 74, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 74, ../scss/_interface.scss */
 .info-text {
   float: left;
   color: white;
 }
 
-/* line 79, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 79, ../scss/_interface.scss */
 #time-control {
   float: left;
   width: 800px;
@@ -93,12 +93,12 @@
   font-family: 'player';
   font-size: 30px;
 }
-/* line 88, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 88, ../scss/_interface.scss */
 #time-control div {
   float: left;
   cursor: pointer;
 }
-/* line 93, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 93, ../scss/_interface.scss */
 #time-control section {
   width: 600px;
   height: 30px;
@@ -106,18 +106,18 @@
   float: left;
   position: relative;
 }
-/* line 100, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 100, ../scss/_interface.scss */
 #time-control section .slider {
   width: 550px;
 }
 
-/* line 106, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 106, ../scss/_interface.scss */
 #time-counter {
   float: left;
   margin-top: -10px;
 }
 
-/* line 111, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 111, ../scss/_interface.scss */
 .slider {
   border-width: 1px;
   border-style: solid;
@@ -132,7 +132,7 @@
   left: 20px;
 }
 
-/* line 125, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 125, ../scss/_interface.scss */
 .tooltip {
   position: absolute;
   display: block;
@@ -156,7 +156,7 @@
   /* W3C */
 }
 
-/* line 143, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 143, ../scss/_interface.scss */
 .icon_volume {
   content: "";
   position: absolute;
@@ -168,7 +168,7 @@
   margin-top: -5px;
 }
 
-/* line 153, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 153, ../scss/_interface.scss */
 .ui-slider-handle {
   position: absolute;
   z-index: 2;
@@ -183,7 +183,7 @@
   margin-left: -12px;
 }
 
-/* line 166, /Users/Shinnosuke/github/re-a-ct/scss/_interface.scss */
+/* line 166, ../scss/_interface.scss */
 .ui-slider-range {
   background: #ffffff;
   /* Old browsers */
@@ -216,37 +216,37 @@
   }
 }
 */
-/* line 22, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 22, ../scss/_font.player.scss */
 .icon-pause:before {
   content: '\2389';
 }
 
 /* '⎉' */
-/* line 23, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 23, ../scss/_font.player.scss */
 .icon-fast-forward:before {
   content: '\23e9';
 }
 
 /* '⏩' */
-/* line 24, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 24, ../scss/_font.player.scss */
 .icon-fast-backward:before {
   content: '\23ea';
 }
 
 /* '⏪' */
-/* line 25, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 25, ../scss/_font.player.scss */
 .icon-stop:before {
   content: '\25a0';
 }
 
 /* '■' */
-/* line 26, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 26, ../scss/_font.player.scss */
 .icon-play:before {
   content: '\25b6';
 }
 
 /* '▶' */
-/* line 27, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 27, ../scss/_font.player.scss */
 .icon-loop:before {
   content: '🔁';
 }
@@ -270,37 +270,37 @@
   }
 }
 */
-/* line 22, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 22, ../scss/_font.player.scss */
 .icon-pause:before {
   content: '\2389';
 }
 
 /* '⎉' */
-/* line 23, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 23, ../scss/_font.player.scss */
 .icon-fast-forward:before {
   content: '\23e9';
 }
 
 /* '⏩' */
-/* line 24, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 24, ../scss/_font.player.scss */
 .icon-fast-backward:before {
   content: '\23ea';
 }
 
 /* '⏪' */
-/* line 25, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 25, ../scss/_font.player.scss */
 .icon-stop:before {
   content: '\25a0';
 }
 
 /* '■' */
-/* line 26, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 26, ../scss/_font.player.scss */
 .icon-play:before {
   content: '\25b6';
 }
 
 /* '▶' */
-/* line 27, /Users/Shinnosuke/github/re-a-ct/scss/_font.player.scss */
+/* line 27, ../scss/_font.player.scss */
 .icon-loop:before {
   content: '🔁';
 }

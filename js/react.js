@@ -4,6 +4,10 @@
 */
 
 this.AudioContext = this.AudioContext || this.webkitAudioContext;
+if(AudioContext === undefined){
+  alert('Web Audio API is not supported in this browser.\n' +
+  'Please launch this site again with Google Chrome.');
+}
 
 (function supportAlternateNames(){
   var tmpctx = new AudioContext();  
@@ -53,6 +57,7 @@ var createStart = false;
 
 //BGM
 var bgloop = new Audio();
+var playlist = [bgloop];
 
 var animaX = 0, animaY = 0;
 var initX = 0, initY = 0;
@@ -160,17 +165,11 @@ $(function(){
   }
   
   function audioContextSetup(){
-    try{
-      ctx = new AudioContext();
-    }catch(e){
-      alert('Web Audio API is not supported in this browser.\n' +
-      'Please launch this site again with Google Chrome.');
-    }
+    ctx = new AudioContext();
     
     bgloop.src = preffix + 'background' + '.' + fileFormat;
     bgloop.autoplay = false;
     bgloop.loop = false;
-    bgloop.restart = true; // Original
     
     analyzer = ctx.createAnalyser();
     analyzer.smoothingTimeConstant = 0.85;
@@ -415,12 +414,9 @@ function schedule(){
         
         
         //画面外のオブジェクトの早期消去
-        if(parseFloat(elm.style.left) < 0 ||
-        inW < parseFloat(elm.style.left) ||
-        parseFloat(elm.style.top) < 0 ||
-        inH < parseFloat(elm.style.top)){
+        if(parseFloat(elm.style.left) < 0 || inW < parseFloat(elm.style.left) ||
+        parseFloat(elm.style.top) < 0 || inH < parseFloat(elm.style.top)){
           elm.style.opacity = elm.style.opacity - 0.1;
-          console.log('out');
         }
 
         // 生存判定
@@ -610,8 +606,6 @@ function drawSpectrum(){
 //User Interface
 
 $(function(){
-  
-  
   //ポーズボタン
   var controlPause = document.getElementById('track-control-pause');
   
@@ -643,18 +637,29 @@ $(function(){
      Mousetrap.trigger('space');
   }, false);
   
+  // 前後
+  if(playlist.length <= 1){
+    $('#track-control-back, #track-control-next').css('display', 'none');
+    $('#track-control')[0].style.width = '120px';
+  }
+  
   //リピートボタン
   var controlRepeat = document.getElementById('track-control-repeat');
   
-  controlRepeat.addEventListener('click', function(){
+  controlRepeat.addEventListener('click', toggleRepeatButton, false);
+  
+  function toggleRepeatButton(){
     bgloop.restart = !bgloop.restart;
     if(bgloop.restart){
       controlRepeat.classList.remove('disabled');
     }else{
       controlRepeat.classList.add('disabled');
     }
-  }, false);
+  }
   
+  // 初期設定
+  bgloop.restart = false; // Original
+  toggleRepeatButton();
   
   //Store frequently elements in variables
   var slider  = $('#volume .slider');
@@ -662,6 +667,7 @@ $(function(){
 
 
   var tooltip = $(document.getElementsByClassName('tooltip')); //Hide the Tooltip at first tooltip.hide();
+  tooltip.hide();
 
 
   slider[0].volumeChange = function(intVal){
@@ -791,7 +797,7 @@ $(function(){
     var hours   = Math.floor(sec_numb / 3600);
     var minutes = Math.floor((sec_numb - (hours * 3600)) / 60);
     var seconds = sec_numb - (hours * 3600) - (minutes * 60);
-
+    
     if (hours   < 10) {hours   = "0"+hours;}
     if (minutes < 10) {minutes = "0"+minutes;}
     if (seconds < 10) {seconds = "0"+seconds;}

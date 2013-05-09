@@ -86,27 +86,37 @@ $(function(){
   var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
   navigator.userAgent.indexOf('Android') !== -1);
   
-  function audioPlayTypeSupported(type, codec){
-    return !! document.createElement('audio').canPlayType(
+  function playTypeLevel(type, codec){
+    var str = document.createElement('audio').canPlayType(
       'audio/' + type + (codec? '; codecs=' + codec: '')
     );
     
-    //if(str === 'probably'){ return 2; }
-    //if(str === 'maybe'){ return 1; }
-    //return 0;
+    if(str === 'probably'){ return 2; }
+    if(str === 'maybe'){ return 1; }
+    return 0;
   }
   
   var fileFormat, fileBitRate = '', base64 = '';
 	
   if(isMobile){
-    if(audioPlayTypeSupported('mp4', 'mp4a.40.5')){
+    if(playTypeLevel('mp4', 'mp4a.40.5') > 0){
       fileFormat = 'm4a';
       fileBitRate = 128;
       base64 = 'base64/';
     }
-  }else{
+
+  }else if(location.hostname === 'localhost'){
     fileFormat = 'wav';
+
+  }else{
+    if(playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('ogg', 'vorbis')){
+      fileFormat = 'm4a';    
+      fileBitRate = 128;      
+    }else{
+      fileFormat = 'ogg';      
+    }
   }
+  
   console.log(base64 + fileFormat + ' mode');
   
   var audioPath = [
@@ -128,7 +138,7 @@ $(function(){
   ];
   
   var preffix = './audio/' + fileFormat + fileBitRate + '/';
-  var suffix = isMobile? '.js': '.' + fileFormat;
+  var suffix = isMobile? '.txt': '.' + fileFormat;
     
   for(var i=0; i < audioPath.length; i++){
     audioPath[i] = preffix + base64 + audioPath[i] + suffix;

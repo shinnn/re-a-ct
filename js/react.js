@@ -266,68 +266,67 @@ $(function(){
 
 function playBass(timing){
   console.log("bass " + timing);
-  source[0] = playSound(bufferLoader.bufferList[0], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[0], ctx.destination, timing);
 }
 
 function playBass0(timing){
   console.log("bass " + timing);
-  source[4] = playSound(bufferLoader.bufferList[4], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[4], ctx.destination, timing);
 }
 
 function playBass1(timing){
   console.log("bass " + timing);
-  source[5] = playSound(bufferLoader.bufferList[5], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[5], ctx.destination, timing);
 }
 
 function playBass2(timing){
   console.log("bass " + timing);
-  source[6] = playSound(bufferLoader.bufferList[6], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[6], ctx.destination, timing);
 }
 
 function playBass3(timing){
   console.log("bass " + timing);
-  source[7] = playSound(bufferLoader.bufferList[7], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[7], ctx.destination, timing);
 }
 
 function playBass4(timing){
   console.log("bass " + timing);
-  source[8] = playSound(bufferLoader.bufferList[8], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[8], ctx.destination, timing);
 }
 
 function playBass5(timing){
   console.log("bass " + timing);
-  source[9] = playSound(bufferLoader.bufferList[9], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[9], ctx.destination, timing);
 }
 
 function playBass6(timing){
   console.log("bass " + timing);
-  source[10] = playSound(bufferLoader.bufferList[10], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[10], ctx.destination, timing);
 }
 
 function playBass7(timing){
   console.log("bass " + timing);
-  source[11] = playSound(bufferLoader.bufferList[11], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[11], ctx.destination, timing);
 }
 
 function playBass8(timing){
   console.log("bass " + timing);
-  source[12] = playSound(bufferLoader.bufferList[12], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[12], ctx.destination, timing);
 }
 
 function playBass9(timing){
   console.log("bass " + timing);
-  source[13] = playSound(bufferLoader.bufferList[13], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[13], ctx.destination, timing);
 }
 
 function playBass10(timing){
   console.log("bass " + timing);
-  source[14] = playSound(bufferLoader.bufferList[14], ctx.destination, timing);
+  playSound(bufferLoader.bufferList[14], ctx.destination, timing);
 }
 
 function playPiano(panX){
-  source[1] = playSound(bufferLoader.bufferList[1], panner, 0);
-  createAnima(source[1].buffer.duration, animaX, animaY);
-  //source[1].buffer.gain = 0;
+  src = playSound(bufferLoader.bufferList[1], panner, 0);
+  createAnima(src.buffer.duration, animaX, animaY);
 }
 
 function playPiano2(timing){
@@ -348,9 +347,7 @@ function playSound(buffer, dest, timing){
   src.buffer.gain = seVolume;
   src.loop = false;
   src.connect(analyzer);
-  src.noteOn(ctx.currentTime + timing);
-  //src.noteOn(ctx.currentTime + timing);
-  //src.stop(ctx.currentTime + buffer.duration);
+  src.start(ctx.currentTime + timing);
   return src;
 }
 
@@ -648,8 +645,12 @@ $(function(){
   
   controlRepeat.addEventListener('click', toggleRepeatButton, false);
   
-  function toggleRepeatButton(){
-    bgloop.restart = !bgloop.restart;
+  function toggleRepeatButton(initialSetting){
+    if(typeof initialSetting === 'boolean'){
+      bgloop.restart = initialSetting;
+    }else{
+      bgloop.restart = !bgloop.restart;      
+    }
     if(bgloop.restart){
       controlRepeat.classList.remove('disabled');
     }else{
@@ -658,8 +659,7 @@ $(function(){
   }
   
   // 初期設定
-  bgloop.restart = false; // Original
-  toggleRepeatButton();
+  toggleRepeatButton(true);
   
   //Store frequently elements in variables
   var slider  = $('#volume .slider');

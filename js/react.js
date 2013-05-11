@@ -9,7 +9,8 @@ if(AudioContext === undefined){
   'Please launch this site again with Google Chrome.');
 }
 
-(function supportAlternateNames(){
+// Support alternate names
+(function(){
   var tmpctx = new AudioContext();  
   var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
   var bufSourceProto = tmpctx.createBufferSource().constructor.prototype;
@@ -62,8 +63,6 @@ var playlist = [bgloop];
 var animaX = 0, animaY = 0;
 var initX = 0, initY = 0;
 
-var source = [];
-
 //効果音の音量
 var seVolume = 1;
 
@@ -115,8 +114,8 @@ $(function(){
 
   }else{
     if(playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('ogg', 'vorbis')){
-      fileFormat = 'm4a';    
-      fileBitRate = 128;      
+      fileFormat = 'm4a';
+      fileBitRate = 128;
     }else{
       fileFormat = 'ogg';      
     }
@@ -330,7 +329,7 @@ function playPiano(panX){
 }
 
 function playPiano2(timing){
-  //source[2] = playSound(bufferLoader.bufferList[2], panner, timing);
+  //source[2]playSound(bufferLoader.bufferList[2], panner, timing);
   //source[2].buffer.gain = 0.5;
   //source[2].buffer.gain = 0;
 }
@@ -503,20 +502,11 @@ function schedule(){
         //playPad(/* (off.left-$(document).width()*0.5)*0.01 + 5 */);
       }
       $(".ripple:gt(" + (len*2 <= 15? len*2: 15) + ")").remove();
-      
-      if(hit > 0){
-        if('0' in source){
-          //source[0].stop(ctx.currentTime);
-        }
-      }
     }
 
     if(time%20 === 0){
       //playBass();
       time = 0;
-      if(source[3]){
-        //source[3].disconnect(ctx.destination);
-      }
     }
     
     time++;
@@ -793,7 +783,7 @@ $(function(){
   
   // http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
   function toHHMMSS(sec, divisionNumber){
-    sec_numb    = parseInt(sec, 10);
+    var sec_numb    = parseInt(sec, 10);
     var hours   = Math.floor(sec_numb / 3600);
     var minutes = Math.floor((sec_numb - (hours * 3600)) / 60);
     var seconds = sec_numb - (hours * 3600) - (minutes * 60);
@@ -802,15 +792,15 @@ $(function(){
     if (minutes < 10) {minutes = "0"+minutes;}
     if (seconds < 10) {seconds = "0"+seconds;}
 
-    var time = '';
+    var resultString = '';
     if(divisionNumber === 2){
-      time = hours+':'+minutes+':'+seconds;
+      resultString = hours+':'+minutes+':'+seconds;
     }else if(divisionNumber === 1){
-      time = minutes+':'+seconds;
+      resultString = minutes+':'+seconds;
     }else{
-      time = seconds;
+      resultString = seconds;
     }
     
-    return time;
+    return resultString;
   }
 });

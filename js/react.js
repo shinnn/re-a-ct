@@ -47,9 +47,11 @@ if(AudioContext === undefined){
 }());
 
 var ctx;
+
 var panner;
 var bufferLoader;
 var analyzer;
+var processor;
 
 var timeoutId = false;
 var noteTime = 0;
@@ -84,11 +86,24 @@ var colorOfLevel = [
   '#FFFFFF'
 ];
 
+var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
+navigator.userAgent.indexOf('Android') !== -1);
+
 $(function(){
-  parent = document.getElementById('container');
+  ctx = new AudioContext();
   
-  var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
-  navigator.userAgent.indexOf('Android') !== -1);
+  analyzer = ctx.createAnalyser();
+  analyzer.smoothingTimeConstant = 0.85;
+  analyzer.connect(ctx.destination);
+  
+  panner = ctx.createPanner();
+  panner.refDistance = 0.1;
+  panner.rolloffFactor = 0.05;
+  panner.connect(analyzer);
+  panner.panningModel = 0;
+  panner.distanceModel = 0;
+  
+  parent = document.getElementById('container');
   
   function playTypeLevel(type, codec){
     var str = document.createElement('audio').canPlayType(
@@ -143,6 +158,10 @@ $(function(){
   
   var preffix = './audio/' + fileFormat + fileBitRate + '/';
   var suffix = isMobile? '.txt': '.' + fileFormat;
+  
+  bgloop.src = preffix + 'background' + '.' + fileFormat;
+  bgloop.autoplay = false;
+  bgloop.loop = false;
     
   for(var i=0; i < audioPath.length; i++){
     audioPath[i] = preffix + base64 + audioPath[i] + suffix;
@@ -157,37 +176,37 @@ $(function(){
     pointingEvent = 'click';
   }
   
-  if(isMobile/* && parent.ontouchstart !== undefined*/){
+  if(isMobile){
     $(parent).on(pointingEvent, null, audioContextSetup);
   }else{
     audioContextSetup();
   }
   
   function audioContextSetup(){
-    ctx = new AudioContext();
+    // Black Magic!
+    function iOSwebAudioInitialize(audioContext){
+      var tmpsrc = audioContext.createBufferSource();
+      var tmpProc = audioContext.createScriptProcessor(256, 1, 1);
+      
+      tmpProc.onaudioprocess = function(e){
+        tmpsrc.disconnect();
+        tmpProc.disconnect();
+        tmpProc.onaudioprocess = null;
+      };
+      
+      tmpsrc.start(0);
+      tmpsrc.connect(tmpProc);
+      tmpProc.connect(audioContext.destination);
+    }
     
-    bgloop.src = preffix + 'background' + '.' + fileFormat;
-    bgloop.autoplay = false;
-    bgloop.loop = false;
-    
-    analyzer = ctx.createAnalyser();
-    analyzer.smoothingTimeConstant = 0.85;
-    analyzer.connect(ctx.destination);
-    
-    panner = ctx.createPanner();
-    panner.refDistance = 0.1;
-    panner.rolloffFactor = 0.05;
-    panner.connect(analyzer);
-    panner.panningModel = 0;
-    panner.distanceModel = 0;
-    
-    //Load Audio Files
-    bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
-    bufferLoader[isMobile? 'loadDataURL': 'load']();
+    iOSwebAudioInitialize(ctx);
     
     $(parent).off(pointingEvent, null, audioContextSetup);
-    
   }
+  
+  //Load Audio Files
+  bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
+  bufferLoader[isMobile? 'loadDataURL': 'load']();
   
   function bufferLoaderCallback(){
     console.log("finish load.");
@@ -225,15 +244,6 @@ $(function(){
         clearTimeout(timeoutId);
         timeoutId = false;
       }
-    });
-    
-    ctx.decodeAudioData(Base64Binary.decodeArrayBuffer(sound), function(audioData) {
-      myBuffer = audioData;
-      mySource = ctx.createBufferSource();
-      mySource.buffer = myBuffer;
-      mySource.connect(ctx.destination);
-      mySource.noteOn(0.01);
-      mySource.noteOff(0.05);      
     });
   }
   
@@ -371,7 +381,7 @@ function schedule(){
   }
   while(noteTime <= currentTime){
     noteTime += (interval*0.0001);
-    drawSpectrum();
+    //drawSpectrum();
 
     if(time%5 === 0){      
       if(createStart === true){
@@ -546,6 +556,9 @@ function createAnima(duration){
   frog.innerText = 'o o'; //眼の描画
   frog.style.left = initX + 'px';
   frog.style.top = initY + 'px';
+  if(isMobile){
+    frog.style.boxShadow = 'none';
+  }
   
   $(frog).animaMove(animaX - initX, animaY - initY, duration * 1000);
 

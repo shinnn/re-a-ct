@@ -3,15 +3,15 @@
  * github.com/shinnn
 */
 
-this.AudioContext = this.AudioContext || this.webkitAudioContext;
-if(AudioContext === undefined){
-  alert('Web Audio API is not supported in this browser.\n' +
-  'Please launch this site again with Google Chrome.');
-}
-
 // Support alternate names
 (function(){
-  var tmpctx = new AudioContext();  
+  this.AudioContext = this.AudioContext || this.webkitAudioContext;
+  if(AudioContext === undefined){
+    alert('Web Audio API is not supported in this browser.\n' +
+    'Please launch this site again with Google Chrome.');
+  }
+  
+  var tmpctx = new AudioContext();
   var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
   var bufSourceProto = tmpctx.createBufferSource().constructor.prototype;
   
@@ -19,16 +19,16 @@ if(AudioContext === undefined){
     return bufSourceProto[normative] === undefined && bufSourceProto[old] !== undefined; 
   };
 
-  if(isStillOld('start', 'noteOn') || isStillOld('start', 'noteOn')){
+  if(isStillOld('start', 'noteOn') || isStillOld('stop', 'noteOff')){
     AudioContext.prototype.createBufferSource = function createBufferSource(){
       var buf = nativeCreateBufferSource.call(this);
-        buf.start = buf.noteOn;
+        buf.start = buf.start || buf.noteOn;
         buf.stop = buf.stop || buf.noteOff;
-          
+        
       return buf;
     };
   }
-    
+  
   if(AudioContext.prototype.createGain === undefined &&
   AudioContext.prototype.createGainNode !== undefined){
     AudioContext.prototype.createGain = AudioContext.prototype.createGainNode;
@@ -43,10 +43,41 @@ if(AudioContext === undefined){
   AudioContext.prototype.createJavaScriptNode !== undefined){
     AudioContext.prototype.createScriptProcessor = AudioContext.prototype.createJavaScriptNode;
   }
-  
 }());
 
-var ctx;
+var ctx = new AudioContext();
+
+// Black magic for iOS 
+(function(audioContext){
+  var body = document.body;
+  var tmpsrc = audioContext.createBufferSource();
+  var tmpProc = audioContext.createScriptProcessor(256, 1, 1);
+	
+  var initialEvent;
+  if(body.ontouchstart !== undefined){
+    initialEvent = 'touchstart';
+  }else if(body.onmousedown !== undefined){
+    initialEvent = 'mousedown';
+  }else{
+    initialEvent = 'click';
+  }
+	
+  body.addEventListener(initialEvent, firstProcess, false);
+	
+  function firstProcess(){  
+    tmpsrc.start(0);
+    tmpsrc.connect(tmpProc);
+    tmpProc.connect(audioContext.destination);				
+  }
+  
+  // This is called only once
+  tmpProc.onaudioprocess = function(){
+    tmpsrc.disconnect();
+    tmpProc.disconnect();
+    body.removeEventListener(initialEvent, firstProcess, false);
+    tmpProc.onaudioprocess = null;
+  };
+}(ctx)); // Don't forget this parameter
 
 var panner;
 var bufferLoader;
@@ -90,8 +121,6 @@ var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
 navigator.userAgent.indexOf('Android') !== -1);
 
 $(function(){
-  ctx = new AudioContext();
-  
   analyzer = ctx.createAnalyser();
   analyzer.smoothingTimeConstant = 0.85;
   analyzer.connect(ctx.destination);
@@ -175,35 +204,7 @@ $(function(){
   }else{
     pointingEvent = 'click';
   }
-  
-  if(isMobile){
-    $(parent).on(pointingEvent, null, audioContextSetup);
-  }else{
-    audioContextSetup();
-  }
-  
-  function audioContextSetup(){
-    // Black Magic!
-    function iOSwebAudioInitialize(audioContext){
-      var tmpsrc = audioContext.createBufferSource();
-      var tmpProc = audioContext.createScriptProcessor(256, 1, 1);
-      
-      tmpProc.onaudioprocess = function(e){
-        tmpsrc.disconnect();
-        tmpProc.disconnect();
-        tmpProc.onaudioprocess = null;
-      };
-      
-      tmpsrc.start(0);
-      tmpsrc.connect(tmpProc);
-      tmpProc.connect(audioContext.destination);
-    }
     
-    iOSwebAudioInitialize(ctx);
-    
-    $(parent).off(pointingEvent, null, audioContextSetup);
-  }
-  
   //Load Audio Files
   bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
   bufferLoader[isMobile? 'loadDataURL': 'load']();
@@ -381,7 +382,7 @@ function schedule(){
   }
   while(noteTime <= currentTime){
     noteTime += (interval*0.0001);
-    //drawSpectrum();
+    drawSpectrum();
 
     if(time%5 === 0){      
       if(createStart === true){

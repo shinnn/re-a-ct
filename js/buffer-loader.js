@@ -10,6 +10,28 @@ function BufferLoader(context,urlList,callback){
 (function(){
   var loader;
   
+  // http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+  function ab2str(buf){
+    // String.fromCharCode.apply(null, new Uint8Array(buf)) だと
+    // 'Maximum call stack size exceeded' が発生するため、下記のように処理する
+        
+    var arr = new Uint8Array(buf);
+    var str = '';
+    for(var i=0, len=arr.length; i<len; i++){
+      str += String.fromCharCode(arr[i]);
+    }
+    return str;
+  }
+
+  function str2ab(str){
+    var buf = new ArrayBuffer(str.length * str.BYTES_PER_ELEMENT);
+    var bufView = new Uint8Array(buf);
+    for (var i=0, len=str.length; i<len; i++) {
+      bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+  }
+  
   BufferLoader.prototype.loadBuffer = function(url, index){
     // Load buffer asynchronously
     var request = new XMLHttpRequest();
@@ -22,9 +44,26 @@ function BufferLoader(context,urlList,callback){
       webAudioDecode.call(this, request.response, index);
     };
   
-    request.onerror = function(){
-      alert('BufferLoader: XHR error');
+    request.onerror = xhrError;
+  
+    request.send();
+  };
+
+  BufferLoader.prototype.loadBuffer2 = function(url, index){
+    // Load buffer asynchronously
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    loader = this;
+    request.onload = function(){
+      console.log(2);
+      // Asynchronously decode the audio file data in request.response
+      sessionStorage.setItem(index, ab2str(request.response));
+      
+      webAudioDecode.call(this, str2ab(sessionStorage.getItem(index)), index);
     };
+  
+    request.onerror = xhrError;
   
     request.send();
   };
@@ -34,8 +73,8 @@ function BufferLoader(context,urlList,callback){
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'text';
-    var loader = this;
-
+    loader = this;
+    
     request.onload = function(){
       // Asynchronously decode the audio file data in request.response
       sessionStorage.setItem(index, request.responseText);
@@ -43,9 +82,7 @@ function BufferLoader(context,urlList,callback){
       webAudioDecode.call(this, Base64Binary.decodeArrayBuffer(sessionStorage.getItem(index)), index);
     };
   
-    request.onerror = function(){
-      alert('BufferLoader: XHR error');
-    };
+    request.onerror = xhrError;
   
     request.send();
   };
@@ -64,16 +101,14 @@ function BufferLoader(context,urlList,callback){
       filereader.readAsDataURL(request.response);
       filereader.onload = function(evt){
         var data = evt.target.result;
-        data = data.substring(data.indexOf('base64,')+7);
+        data = data.substr(data.indexOf('base64,')+7);
         data = Base64Binary.decodeArrayBuffer(data);
       
         webAudioDecode.call(this, data, index);
       };
     };
   
-    request.onerror = function(){
-      alert('BufferLoader: XHR error');
-    };
+    request.onerror = xhrError;
   
     request.send();
   };
@@ -93,6 +128,7 @@ function BufferLoader(context,urlList,callback){
           alert('error decoding file data: '+url);
           return;
         }
+        console.log(buffer);
         loader.bufferList[index] = buffer;
         if(++loader.loadCount == loader.urlList.length){
           loader.onload(loader.bufferList);
@@ -101,9 +137,12 @@ function BufferLoader(context,urlList,callback){
       function errorCallback(error){
         console.error('decodeAudioData error', error);
       }
-    );        
+    );    
   }
-    
+  
+  function xhrError(){
+    alert('BufferLoader: XHR error');
+  }
 
 
   BufferLoader.prototype.load = function(){

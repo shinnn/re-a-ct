@@ -1,2 +1,2 @@
 #JavaScript用フォルダ
-自作のスクリプトはfunctions.js、fullscreen.jsの二つです。ほかはjQueryなどのライブラリです。
+オリジナルのスクリプトはfunctions.js、fullscreen.jsの二つです。ほかはjQueryなどのライブラリです。

@@ -1,6 +1,6 @@
 // http://chromium.googlecode.com/svn/trunk/samples/audio/doc/loading-sounds.html
-function BufferLoader(context,urlList,callback){
-  this.context = context;
+function BufferLoader(audioContext, urlList, callback){
+  this.context = audioContext;
   this.urlList = urlList;
   this.onload = callback;
   this.bufferList = [];
@@ -9,20 +9,46 @@ function BufferLoader(context,urlList,callback){
 
 (function(){
   var is_iOS = navigator.userAgent.indexOf('like Mac OS X') !== -1;
-  var loader;
 
   BufferLoader.prototype.loadBuffer = function(url, index){
     // Load buffer asynchronously
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
-    loader = this;
+    var loader = this;
+
+    // Asynchronously decode the audio file data in request.response
     request.onload = function(){
-      // Asynchronously decode the audio file data in request.response
-      webAudioDecode(getArrayBuffer(request.response), index);
+    
+      /*
+      void decodeAudioData(
+        ArrayBuffer audioData,
+        DecodeSuccessCallback successCallback,
+        optional DecodeErrorCallback errorCallback
+      );
+      */
+      loader.context.decodeAudioData(
+        getArrayBuffer(request.response),
+        function successCallback(buffer){
+          if(! buffer){
+            alert('error decoding file data: '+url);
+            return;
+          }
+          loader.bufferList[index] = buffer;
+          if(++loader.loadCount == loader.urlList.length){
+            loader.onload(loader.bufferList);
+          }
+        },
+        function errorCallback(error){
+          console.error('decodeAudioData error', error);
+        }
+      );
     };
   
-    request.onerror = xhrError;
+    request.onerror = function(){
+      alert('BufferLoader: XHR error');
+    };
+    
     request.send();
   };
   
@@ -30,9 +56,9 @@ function BufferLoader(context,urlList,callback){
   if(is_iOS){
     // http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
     var ab2str = function(buf){
-      // String.fromCharCode.apply(null, new Uint8Array(buf)) だと
+      // 上述のURLの例のとおり String.fromCharCode.apply(null, new Uint8Array(buf)) とすると
       // 'Maximum call stack size exceeded' が発生するため、下記のように処理する
-        
+      
       var arr = new Uint8Array(buf);
       var str = '';
       for(var i=0, len=arr.length; i<len; i++){
@@ -50,50 +76,22 @@ function BufferLoader(context,urlList,callback){
       return buf;
     };
     
-    getArrayBuffer = function(res){
-      return str2ab(ab2str(res));
+    getArrayBuffer = function(response){
+      // iOSでは、XHRで取得した ArrayBuffer を直接デコードすることができない。
+      // 一度 ArrayBuffer を String に変換し、再度 ArrayBuffer 化したものをデコードする。
+      return str2ab(ab2str(response));
     };
-  }else{
-    getArrayBuffer = function(res){
-      return res;
-    };
-  }
-  
-  function webAudioDecode(arrayBuffer, index){
-    /*
-    Web IDL:
-    void decodeAudioData(ArrayBuffer audioData,
-      DecodeSuccessCallback successCallback,
-      optional DecodeErrorCallback errorCallback);
-    */
     
-    loader.context.decodeAudioData(
-      arrayBuffer,
-      function successCallback(buffer){
-        if(! buffer){
-          alert('error decoding file data: '+url);
-          return;
-        }
-        loader.bufferList[index] = buffer;
-        if(++loader.loadCount == loader.urlList.length){
-          loader.onload(loader.bufferList);
-        }
-      },
-      function errorCallback(error){
-        console.error('decodeAudioData error', error);
-      }
-    );    
+  }else{
+    getArrayBuffer = function(response){
+      return response;
+    };
   }
-  
-  function xhrError(){
-    alert('BufferLoader: XHR error');
-  }
-
 
   BufferLoader.prototype.load = function(){
-    loader = this;
     for(var i=0; i < this.urlList.length; ++i){
       this.loadBuffer(this.urlList[i], i);
     }
   };
+  
 }());

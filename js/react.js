@@ -3,15 +3,16 @@
  * github.com/shinnn
 */
 
-// Support alternate names
 (function(){
   this.AudioContext = this.AudioContext || this.webkitAudioContext;
   if(AudioContext === undefined){
     alert('Web Audio API is not supported in this browser.\n' +
     'Please launch this site again with Google Chrome.');
   }
-  
   var tmpctx = new AudioContext();
+	
+	// Support alternate names
+	// start (noteOn), stop (noteOff), createGain (createGainNode), etc.
   var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
   var bufSourceProto = tmpctx.createBufferSource().constructor.prototype;
   
@@ -43,41 +44,50 @@
   AudioContext.prototype.createJavaScriptNode !== undefined){
     AudioContext.prototype.createScriptProcessor = AudioContext.prototype.createJavaScriptNode;
   }
+	
+  // Black magic for iOS 
+  var is_iOS = (navigator.userAgent.indexOf('like Mac OS X') !== -1);
+  if(is_iOS){
+    var NativeAudioContext = AudioContext;
+    this.AudioContext = function(){
+      var audioContext = new NativeAudioContext();
+			
+      var body = document.body;
+      var tmpsrc = audioContext.createBufferSource();
+      var tmpProc = audioContext.createScriptProcessor(256, 1, 1);
+	
+      var initialEvent;
+      if(body.ontouchstart !== undefined){
+        initialEvent = 'touchstart';
+      }else if(body.onmousedown !== undefined){
+        initialEvent = 'mousedown';
+      }else{
+        initialEvent = 'click';
+      }
+	
+      body.addEventListener(initialEvent, firstProcess, false);
+	
+      function firstProcess(){  
+        tmpsrc.start(0);
+        tmpsrc.connect(tmpProc);
+        tmpProc.connect(audioContext.destination);				
+      }
+  
+      // This function will be called once and for all.
+      tmpProc.onaudioprocess = function(){
+        tmpsrc.disconnect();
+        tmpProc.disconnect();
+        body.removeEventListener(initialEvent, firstProcess, false);
+        tmpProc.onaudioprocess = null;
+      };
+			
+      return audioContext;
+    };
+  }
+	
 }());
 
 var ctx = new AudioContext();
-
-// Black magic for iOS 
-(function(audioContext){
-  var body = document.body;
-  var tmpsrc = audioContext.createBufferSource();
-  var tmpProc = audioContext.createScriptProcessor(256, 1, 1);
-	
-  var initialEvent;
-  if(body.ontouchstart !== undefined){
-    initialEvent = 'touchstart';
-  }else if(body.onmousedown !== undefined){
-    initialEvent = 'mousedown';
-  }else{
-    initialEvent = 'click';
-  }
-	
-  body.addEventListener(initialEvent, firstProcess, false);
-	
-  function firstProcess(){  
-    tmpsrc.start(0);
-    tmpsrc.connect(tmpProc);
-    tmpProc.connect(audioContext.destination);				
-  }
-  
-  // This is called only once
-  tmpProc.onaudioprocess = function(){
-    tmpsrc.disconnect();
-    tmpProc.disconnect();
-    body.removeEventListener(initialEvent, firstProcess, false);
-    tmpProc.onaudioprocess = null;
-  };
-}(ctx)); // Don't forget this parameter
 
 var panner;
 var bufferLoader;
@@ -190,7 +200,15 @@ $(function(){
   bgloop.src = preffix + 'background' + suffix;
   bgloop.autoplay = false;
   bgloop.loop = false;
-    
+  
+  // MediaElement
+  /*
+  window.addEventListener('load', function(){
+    var bgsource = ctx.createMediaElementSource(bgloop);
+    bgsource.connect(analyzer);  
+  }, false);
+  */
+  
   for(var i=0; i < audioPath.length; i++){
     audioPath[i] = preffix + audioPath[i] + suffix;
   }
@@ -226,12 +244,12 @@ $(function(){
       createStart = true;
       animaX = e.pageX || e.originalEvent.pageX;
       animaY = e.pageY || e.originalEvent.pageY;
-
-      console.log(pointingEvent + ' fired.');
     });
-  
+    
     //SPACE key binding
-    Mousetrap.bind('space', function pauseBGloop(keyboardEvent){
+    Mousetrap.bind('space', pauseBGloop);
+    
+    function pauseBGloop(keyboardEvent){
       if(keyboardEvent){
         keyboardEvent.preventDefault();
       }
@@ -244,7 +262,23 @@ $(function(){
         clearTimeout(timeoutId);
         timeoutId = false;
       }
-    });
+    }
+    
+    // タブがアクティブで無くなった場合、一時停止する
+    // https://developers.google.com/chrome/whitepapers/pagevisibility
+    document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
+    function handleVisibilityChange(){
+      if(document.webkitHidden){
+        bgloop.pause();
+        clearTimeout(timeoutId);
+        timeoutId = false;
+      }else{
+        bgloop.play();
+        startTime = ctx.currentTime - noteTime;
+        schedule();
+      }
+    }
+    
   }
   
   //m key binding
@@ -817,3 +851,4 @@ $(function(){
     return resultString;
   }
 });
+

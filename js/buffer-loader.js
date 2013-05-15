@@ -8,6 +8,8 @@ function BufferLoader(context,urlList,callback){
 }
 
 (function(){
+  var is_iOS = navigator.userAgent.indexOf('like Mac OS X') !== -1;
+  
   var loader;
   
   // http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
@@ -24,9 +26,9 @@ function BufferLoader(context,urlList,callback){
   }
 
   function str2ab(str){
-    var buf = new ArrayBuffer(str.length * str.BYTES_PER_ELEMENT);
+    var buf = new ArrayBuffer(str.length * Uint8Array.BYTES_PER_ELEMENT); // BYTES_... = 1
     var bufView = new Uint8Array(buf);
-    for (var i=0, len=str.length; i<len; i++) {
+    for (var i=0, len=str.length; i<len; i++){
       bufView[i] = str.charCodeAt(i);
     }
     return buf;
@@ -49,63 +51,18 @@ function BufferLoader(context,urlList,callback){
     request.send();
   };
 
-  BufferLoader.prototype.loadBuffer2 = function(url, index){
+  BufferLoader.prototype.loadBuffer = function(url, index){
     // Load buffer asynchronously
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
     loader = this;
     request.onload = function(){
-      console.log(2);
       // Asynchronously decode the audio file data in request.response
-      sessionStorage.setItem(index, ab2str(request.response));
-      
-      webAudioDecode.call(this, str2ab(sessionStorage.getItem(index)), index);
-    };
-  
-    request.onerror = xhrError;
-  
-    request.send();
-  };
-
-  BufferLoader.prototype.loadBufferBase64 = function(url, index){
-    // Load buffer asynchronously
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.responseType = 'text';
-    loader = this;
-    
-    request.onload = function(){
-      // Asynchronously decode the audio file data in request.response
-      sessionStorage.setItem(index, request.responseText);
-      
-      webAudioDecode.call(this, Base64Binary.decodeArrayBuffer(sessionStorage.getItem(index)), index);
-    };
-  
-    request.onerror = xhrError;
-  
-    request.send();
-  };
-
-  // Use FileReader (Unavailable in Safari)
-  BufferLoader.prototype.loadBufferFR = function(url, index){
-    // Load buffer asynchronously
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.responseType = 'blob';
-    loader = this;
-    var filereader = new FileReader();
-
-    request.onload = function(){
-      // Asynchronously decode the audio file data in request.response
-      filereader.readAsDataURL(request.response);
-      filereader.onload = function(evt){
-        var data = evt.target.result;
-        data = data.substr(data.indexOf('base64,')+7);
-        data = Base64Binary.decodeArrayBuffer(data);
-      
-        webAudioDecode.call(this, data, index);
-      };
+      webAudioDecode(
+        is_iOS? str2ab(ab2str(request.response)): request.response,
+        index
+      );
     };
   
     request.onerror = xhrError;
@@ -128,7 +85,6 @@ function BufferLoader(context,urlList,callback){
           alert('error decoding file data: '+url);
           return;
         }
-        console.log(buffer);
         loader.bufferList[index] = buffer;
         if(++loader.loadCount == loader.urlList.length){
           loader.onload(loader.bufferList);
@@ -151,11 +107,4 @@ function BufferLoader(context,urlList,callback){
       this.loadBuffer(this.urlList[i], i);
     }
   };
-
-  BufferLoader.prototype.loadDataURL = function(){
-    loader = this;
-    for(var i=0; i < this.urlList.length; ++i){
-      this.loadBufferBase64(this.urlList[i], i);
-    }
-  };  
 }());

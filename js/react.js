@@ -144,13 +144,12 @@ $(function(){
     return 0;
   }
   
-  var fileFormat, fileBitRate = '', base64 = '';
+  var fileFormat, fileBitRate = '';
 	
   if(isMobile){
     if(playTypeLevel('mp4', 'mp4a.40.5') > 0){
       fileFormat = 'm4a';
       fileBitRate = 128;
-      base64 = 'base64/';
     }
 
   }else if(location.hostname === 'localhost'){
@@ -165,7 +164,7 @@ $(function(){
     }
   }
   
-  console.log(base64 + fileFormat + ' mode');
+  console.log(fileFormat + ' mode');
   
   var audioPath = [
   "beat",
@@ -185,15 +184,15 @@ $(function(){
   "beat10"
   ];
   
-  var preffix = './audio/' + fileFormat + fileBitRate + '/';
-  var suffix = isMobile? '.txt': '.' + fileFormat;
+  var preffix = 'audio/' + fileFormat + fileBitRate + '/';
+  var suffix = '.' + fileFormat;
   
-  bgloop.src = preffix + 'background' + '.' + fileFormat;
+  bgloop.src = preffix + 'background' + suffix;
   bgloop.autoplay = false;
   bgloop.loop = false;
     
   for(var i=0; i < audioPath.length; i++){
-    audioPath[i] = preffix + base64 + audioPath[i] + suffix;
+    audioPath[i] = preffix + audioPath[i] + suffix;
   }
   
   var pointingEvent;
@@ -207,7 +206,7 @@ $(function(){
     
   //Load Audio Files
   bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
-  bufferLoader[isMobile? 'loadDataURL': 'load']();
+  bufferLoader.load();
   
   function bufferLoaderCallback(){
     console.log("finish load.");

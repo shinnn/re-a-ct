@@ -65,9 +65,9 @@
         initialEvent = 'click';
       }
 	
-      body.addEventListener(initialEvent, firstProcess, false);
+      body.addEventListener(initialEvent, instantProcess, false);
 	
-      function firstProcess(){  
+      function instantProcess(){  
         tmpsrc.start(0);
         tmpsrc.connect(tmpProc);
         tmpProc.connect(audioContext.destination);				
@@ -77,7 +77,7 @@
       tmpProc.onaudioprocess = function(){
         tmpsrc.disconnect();
         tmpProc.disconnect();
-        body.removeEventListener(initialEvent, firstProcess, false);
+        body.removeEventListener(initialEvent, instantProcess, false);
         tmpProc.onaudioprocess = null;
       };
 			
@@ -161,7 +161,7 @@ $(function(){
       fileFormat = 'm4a';
       fileBitRate = 128;
     }
-
+  
   }else if(location.hostname === 'localhost'){
     fileFormat = 'wav';
 

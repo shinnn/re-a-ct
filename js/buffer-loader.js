@@ -1,4 +1,6 @@
+// Fork from Chromium's 'Bufferloader' class
 // http://chromium.googlecode.com/svn/trunk/samples/audio/doc/loading-sounds.html
+
 function BufferLoader(audioContext, urlList, callback){
   this.context = audioContext;
   this.urlList = urlList;

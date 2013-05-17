@@ -13,20 +13,35 @@
 	
 	// Support alternate names
 	// start (noteOn), stop (noteOff), createGain (createGainNode), etc.
-  var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
-  var bufSourceProto = tmpctx.createBufferSource().constructor.prototype;
-  
   var isStillOld = function(normative, old){
-    return bufSourceProto[normative] === undefined && bufSourceProto[old] !== undefined; 
+    return normative === undefined && old !== undefined; 
   };
 
-  if(isStillOld('start', 'noteOn') || isStillOld('stop', 'noteOff')){
+  var bufProto = tmpctx.createBufferSource().constructor.prototype;  
+  
+  if(isStillOld(bufProto.start, bufProto.noteOn) || isStillOld(bufProto.stop, bufProto.noteOff)){
+    var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
+
     AudioContext.prototype.createBufferSource = function createBufferSource(){
-      var buf = nativeCreateBufferSource.call(this);
-        buf.start = buf.start || buf.noteOn;
-        buf.stop = buf.stop || buf.noteOff;
+      var returnNode = nativeCreateBufferSource.call(this);
+      returnNode.start = returnNode.start || returnNode.noteOn;
+      returnNode.stop = returnNode.stop || returnNode.noteOff;
         
-      return buf;
+      return returnNode;
+    };
+  }
+  
+  var oscProto = tmpctx.createOscillator().constructor.prototype;
+  
+  if(isStillOld(oscProto.start, oscProto.noteOn) || isStillOld(oscProto.stop, oscProto.noteOff)){
+    var nativeCreateOscillator = AudioContext.prototype.createOscillator;
+
+    AudioContext.prototype.createOscillator = function createOscillator(){
+      var returnNode = nativeCreateOscillator.call(this);
+      returnNode.start = returnNode.start || returnNode.noteOn;
+      returnNode.stop = returnNode.stop || returnNode.noteOff;
+        
+      return returnNode;
     };
   }
   

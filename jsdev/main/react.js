@@ -443,17 +443,14 @@ function schedule(){
     if(time%10 === 0){
       
       released = document.getElementsByClassName('released');
-      var len = released.length;
-      //参考 http://nanto.asablo.jp/blog/2006/02/21/262269
-      //forループ外でlengthプロパティを呼び出し、パフォーマンス向上
 
       frog = document.getElementsByClassName('frog');
       hit = 0;
       
-      var i, elm, obj;
+      var elm, obj;
       var inW = window.innerWidth, inH = window.innerHeight;
       //each method start
-      for(i=0; i < len; i++){
+      for(var i=0, len = released.length; i < len; i++){
         var current = i + Math.round(Math.random());
         elm = released[i], obj = $(elm);
         var level = elm.dataset.level;

@@ -1,7 +1,7 @@
 module.exports = (grunt)->
-  devDep = grunt.file.readJSON('package.json').devDependencies
+  devDeps = grunt.file.readJSON('package.json').devDependencies
   
-  for taskName, version of devDep
+  for taskName, version of devDeps
     if 'grunt-' is taskName.substring 0, 6
       grunt.loadNpmTasks(taskName)
         
@@ -41,6 +41,4 @@ module.exports = (grunt)->
         files: ['*.html']
           
   grunt.task.registerTask 'box', ['shell:box']
-  grunt.task.registerTask 'default', [
-    'compass', 'concat', 'watch'
-  ]
+  grunt.task.registerTask 'default', ['compass', 'concat', 'watch']

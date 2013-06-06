@@ -4,6 +4,24 @@ module.exports = (grunt)->
   for taskName, version of devDeps
     if 'grunt-' is taskName.substring 0, 6
       grunt.loadNpmTasks(taskName)
+  
+  writeBeatTime = (err, stdout, stderr, cb)->
+    beatArray = stdout.split '\n'
+    beatArray.pop()
+    
+    beatArray.forEach (element, index)->
+      beatArray[index] = parseFloat(element, 10);
+    
+    preBeat = beatArray[1] - beatArray[0]
+    beatPoint = beatArray[1]
+    
+    while beatPoint >= 0
+      beatArray.unshift(beatPoint)
+      beatPoint -= preBeat
+        
+    beatTimes = {"beat_times": beatArray};
+    json = JSON.stringify [beatTimes], null, 2;
+    grunt.file.write 'json/beat.json', json
         
   grunt.initConfig
     compass:
@@ -21,7 +39,13 @@ module.exports = (grunt)->
           
       contrib:
         src: ['jsdev/contrib/*.js']
-        dest: 'js/contrib.js' 
+        dest: 'js/contrib.js'
+    
+    shell:
+      aubiotrack:
+        command: 'aubiotrack -i audio/wav/background.wav -O complexdomain'
+        options:
+          callback: writeBeatTime
     
     watch:
       options:
@@ -39,6 +63,8 @@ module.exports = (grunt)->
         tasks: ['concat:contrib']
       html:
         files: ['*.html']
-          
-  grunt.task.registerTask 'box', ['shell:box']
+  
+  grunt.task.registerTask 'beat', ->
+    
+    
   grunt.task.registerTask 'default', ['compass', 'concat', 'watch']

@@ -539,8 +539,21 @@ function playSound(buffer, dest, timing){
 
 var time = 0;
 
+var beatMap;
+$.getJSON(
+  'json/beat.json',
+  function(data){
+    beatMap = data[0].beat_times;
+    
+    interval = (beatMap[1] - beatMap[0]) * 1000;
+  }
+);
+
+var beatIndex = 0;
+
 //parameters
 var interval = 542; //542;
+//beatIndex++;
 var hitInterval = interval * 0.001 * 1/12 * 6;
 var movementRange = 500; //　一回の移動範囲
 
@@ -552,12 +565,14 @@ function schedule(){
     if(document.getElementsByClassName('released').length > 0){
       console.log("restart");
       bgloop.play();
+
     }else{
       //welcome or click here
     }
   }
+  
   while(noteTime <= currentTime){
-    noteTime += (interval*0.0001);
+    noteTime += interval*0.001 * 0.1;
     drawSpectrum();
 
     if(time%5 === 0){      
@@ -570,21 +585,30 @@ function schedule(){
 
     if(time%10 === 0){
       
+      for(var i=1; i < beatMap.length; i++){
+        if(beatMap[i] > currentTime){
+          interval = (beatMap[i] - beatMap[i-1]) * 1000;
+          hitInterval = interval * 0.001 * 1/12 * 6;
+          console.log('int', interval);
+          break;
+        }
+      }
+            
       released = document.getElementsByClassName('released');
 
       frog = document.getElementsByClassName('frog');
       hit = 0;
       
-      var elm, obj;
+      var elm, obj, level, varX, varY;
       var inW = window.innerWidth, inH = window.innerHeight;
       //each method start
       for(var i=0, len = released.length; i < len; i++){
         var current = i + Math.round(Math.random());
         elm = released[i], obj = $(elm);
-        var level = elm.dataset.level;
+        level = elm.dataset.level;
 
-        var varX = Math.floor((Math.random() - 0.5) * movementRange);
-        var varY = Math.floor((Math.random() - 0.5) * movementRange);
+        varX = Math.floor((Math.random() - 0.5) * movementRange);
+        varY = Math.floor((Math.random() - 0.5) * movementRange);
         varXY = (Math.abs(varX) + Math.abs(varY)) * 1.5 + 100;
         
         if(level == 10){

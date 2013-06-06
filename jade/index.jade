@@ -1,0 +1,57 @@
+!!! 5
+html(lang='ja')
+  head
+    meta(charset='utf-8')
+    title re(a)ct - Sound Interaction with HTML5 Web Audio API
+    meta(name='keywords', content='HTML5,Web Audio API,JavaScript')
+    meta(name='description', content='Sound Interaction with HTML5 Web Audio API')
+    meta(name='author', content='Shinnosuke Watanabe')
+    meta(property='og:type', content='website')
+    meta(property='og:url', content='http://shinnn.github.io/re-a-ct/')
+    meta(property='og:image', content='')
+    meta(property='og:description', content='')
+    meta(property='og:site_name', content='RE(A)CT - Sound Interaction with HTML5 Web Audio API')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='format-detection', content='telephone=no')
+    link(href='css/normalize.css', rel='stylesheet', media='screen')
+    link(href='css/styles.css', rel='stylesheet', media='screen')
+  body
+    include google-analytics
+    #container
+      #welcome
+        | マウスで画面のどこかを
+        br
+        | クリックしてみてください
+    #side-menu
+      //- ul.tracklist
+        li 01 Song Name
+        li 02 Song Name
+        li 03 Song Name
+      canvas#waveform
+    footer
+      #track-control
+        #track-control-back.icon-fast-backward
+        #track-control-pause.icon-pause
+        #track-control-next.icon-fast-forward
+        #track-control-repeat.icon-loop.disabled
+      #volume
+        section#bg_volume
+          span.tooltip
+          .info-text
+          .slider
+          span.icon_volume
+        section#se_volume
+          .slider
+          span.icon_volume
+      #time-control
+        section
+          .slider
+        #time-counter
+          span 00:00
+          | &nbsp;/&nbsp;
+          span 00:00
+      #shortcut
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.1/jquery.min.js')
+    script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
+    script(src='js/contrib.js')
+    script(src='js/re-a-ct.js')

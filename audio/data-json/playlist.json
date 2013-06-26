@@ -4,7 +4,7 @@
     "template": "${format}tracks/",
     "format": {
       "wav": "raw/",
-      "m4a": "compressed/m4a/",
+      "m4a": "compressed/m4a-128/",
       "mp3": "compressed/mp3/",
       "ogg": "compressed/ogg/"
     }

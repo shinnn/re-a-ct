@@ -3,106 +3,55 @@
  * github.com/shinnn
 */
 
-(function(){
-  this.AudioContext = this.AudioContext || this.webkitAudioContext;
-  if(AudioContext === undefined){
-    alert('Web Audio API is not supported in this browser.\n' +
-    'Please launch this site again with Google Chrome.');
-  }
-  var tmpctx = new AudioContext();
-	
-	// Support alternate names
-	// start (noteOn), stop (noteOff), createGain (createGainNode), etc.
-  var isStillOld = function(normative, old){
-    return normative === undefined && old !== undefined; 
-  };
-
-  var bufProto = tmpctx.createBufferSource().constructor.prototype;  
-  
-  if(isStillOld(bufProto.start, bufProto.noteOn) || isStillOld(bufProto.stop, bufProto.noteOff)){
-    var nativeCreateBufferSource = AudioContext.prototype.createBufferSource;
-
-    AudioContext.prototype.createBufferSource = function createBufferSource(){
-      var returnNode = nativeCreateBufferSource.call(this);
-      returnNode.start = returnNode.start || returnNode.noteOn;
-      returnNode.stop = returnNode.stop || returnNode.noteOff;
-        
-      return returnNode;
-    };
-  }
-  
-  var oscProto = tmpctx.createOscillator().constructor.prototype;
-  
-  if(isStillOld(oscProto.start, oscProto.noteOn) || isStillOld(oscProto.stop, oscProto.noteOff)){
-    var nativeCreateOscillator = AudioContext.prototype.createOscillator;
-
-    AudioContext.prototype.createOscillator = function createOscillator(){
-      var returnNode = nativeCreateOscillator.call(this);
-      returnNode.start = returnNode.start || returnNode.noteOn;
-      returnNode.stop = returnNode.stop || returnNode.noteOff;
-        
-      return returnNode;
-    };
-  }
-  
-  if(AudioContext.prototype.createGain === undefined &&
-  AudioContext.prototype.createGainNode !== undefined){
-    AudioContext.prototype.createGain = AudioContext.prototype.createGainNode;
-  }
-
-  if(AudioContext.prototype.createDelay === undefined &&
-  AudioContext.prototype.createDelayNode !== undefined){
-    AudioContext.prototype.createDelay = AudioContext.prototype.createGainNode;
-  }
-  
-  if(AudioContext.prototype.createScriptProcessor === undefined &&
-  AudioContext.prototype.createJavaScriptNode !== undefined){
-    AudioContext.prototype.createScriptProcessor = AudioContext.prototype.createJavaScriptNode;
-  }
-	
-  // Black magic for iOS 
-  var is_iOS = (navigator.userAgent.indexOf('like Mac OS X') !== -1);
-  if(is_iOS){
-    var NativeAudioContext = AudioContext;
-    this.AudioContext = function(){
-      var audioContext = new NativeAudioContext();
-			
-      var body = document.body;
-      var tmpsrc = audioContext.createBufferSource();
-      var tmpProc = audioContext.createScriptProcessor(256, 1, 1);
-	
-      var initialEvent;
-      if(body.ontouchstart !== undefined){
-        initialEvent = 'touchstart';
-      }else if(body.onmousedown !== undefined){
-        initialEvent = 'mousedown';
-      }else{
-        initialEvent = 'click';
-      }
-	
-      body.addEventListener(initialEvent, instantProcess, false);
-	
-      function instantProcess(){  
-        tmpsrc.start(0);
-        tmpsrc.connect(tmpProc);
-        tmpProc.connect(audioContext.destination);				
-      }
-  
-      // This function will be called once and for all.
-      tmpProc.onaudioprocess = function(){
-        tmpsrc.disconnect();
-        tmpProc.disconnect();
-        body.removeEventListener(initialEvent, instantProcess, false);
-        tmpProc.onaudioprocess = null;
-      };
-			
-      return audioContext;
-    };
-  }
-	
-}());
-
 var ctx = new AudioContext();
+
+window.Dominant = function(audioContext){
+  //tmp
+};
+
+Dominant.createPlaylist = function(){
+  var Playlist = {};
+  Playlist.tracks = [];
+  Playlist.currentTrack = null;
+  Playlist.currentTime = 0;
+  
+  this.play = function(){
+    if(!!Playlist.currentTrack){
+      Playlist.currentTrack.play();      
+    }else{
+      if(Playlist.tracks.length > 0){
+        Playlist.tracks[0].play();
+        Playlist.currentTrack  = Playlist.tracks[0];
+      }
+    }
+  };
+  
+  Playlist.nextTrack = function(){
+    //tmp
+  };
+  
+  Playlist.prevTrack = function(){
+    //tmp
+  };
+  
+  Playlist.onplay = null;
+  Playlist.onpause = null;
+
+  return Playlist;
+};
+
+Dominant.loadPlaylist = function(){
+  var json;
+/*  
+  $.getJSON(
+    'audio/json/playlist.json',
+    function(data){
+      json = data[0].beat_times;    
+      interval = (beatMap[1] - beatMap[0]) * 1000;
+    }
+  );
+*/  
+};
 
 var panner;
 var bufferLoader;
@@ -208,11 +157,23 @@ $(function(){
   "beat9",
   "beat10"
   ];
-  
-  var preffix = 'audio/' + fileFormat + fileBitRate + '/';
+    
+  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': fileFormat+ '-') + fileBitRate + '/';
   var suffix = '.' + fileFormat;
   
-  bgloop.src = preffix + 'background' + suffix;
+  var path;
+  $.getJSON(
+    'audio/data-json/playlist.json',
+    function(data){
+      var path = data.cwd +
+                 data.src.template.replace('${format}', data.src.format[fileFormat]) +
+                 data.tracks[0].fileName + '.' + fileFormat;
+      console.log(path);
+      bgloop.src = path;
+    }
+  );
+  
+  bgloop.src = path;
   bgloop.autoplay = false;
   bgloop.loop = false;
   
@@ -225,7 +186,7 @@ $(function(){
   */
   
   for(var i=0; i < audioPath.length; i++){
-    audioPath[i] = preffix + audioPath[i] + suffix;
+    audioPath[i] = preffix + 'effects/' + audioPath[i] + suffix;
   }
   
   var pointingEvent;
@@ -413,9 +374,11 @@ var time = 0;
 
 var beatMap;
 $.getJSON(
-  'json/beat.json',
+  'audio/data-json/_analysis.json',
   function(data){
-    beatMap = data[0].beat_times;    
+    var json = data.tracks['main/background'];
+
+    beatMap = json.beat_times;    
     interval = (beatMap[1] - beatMap[0]) * 1000;
   }
 );

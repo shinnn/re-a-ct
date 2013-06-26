@@ -1,0 +1,30 @@
+{
+  "cwd": "audio/",
+  "src": {
+    "template": "${format}tracks/",
+    "format": {
+      "wav": "raw/",
+      "m4a": "compressed/m4a/",
+      "mp3": "compressed/mp3/",
+      "ogg": "compressed/ogg/"
+    }
+  },
+  "tracks": [
+    {
+      "fileName": "main/background",
+      "title": "BGM1",
+      "artist": "Shinnosuke Watanabe",
+      "album": "Misc",
+      "genre": "Pop",
+      "description": "Hello!"
+    },
+    {
+      "fileName": "main_theme",
+      "title": "",
+      "artist": "Shinnosuke Watanabe",
+      "album": "",
+      "genre": "Classic",
+      "description": "Hello!"
+    }
+  ]
+}

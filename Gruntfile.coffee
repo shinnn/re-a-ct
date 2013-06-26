@@ -1,29 +1,62 @@
-module.exports = (grunt)->
+module.exports = (grunt) ->
   devDeps = grunt.file.readJSON('package.json').devDependencies
   
   for taskName, version of devDeps
     if 'grunt-' is taskName.substring 0, 6
       grunt.loadNpmTasks(taskName)
   
-  writeBeatTime = (err, stdout, stderr, cb)->
+  # 出力する音響解析結果を格納するオブジェクト
+  analysis =
+    tracks: {}
+  
+  writeBeatTimes = (err, stdout, stderr, cb) ->  
     beatArray = stdout.split '\n'
     beatArray.pop()
     
-    beatArray.forEach (element, index)->
-      beatArray[index] = parseFloat(element, 10);
+    for beat, i in beatArray
+      beatArray[i] = parseFloat beat, 10
     
+    # aubio が最初の方のビートを検知しない不具合への対処
     preBeat = beatArray[1] - beatArray[0]
     beatPoint = beatArray[1]
     
     while beatPoint >= 0
-      beatArray.unshift(beatPoint)
+      beatArray.unshift ( beatPoint )
       beatPoint -= preBeat
-        
-    beatTimes = {"beat_times": beatArray};
-    json = JSON.stringify [beatTimes], null, 2;
-    grunt.file.write 'json/beat.json', json
-        
-  grunt.initConfig
+    
+    analysis.tracks[grunt.config 'trackPath'] =
+      beat_times: beatArray
+
+    console.log grunt.config 'trackPath'
+    cb()
+  
+  grunt.task.registerTask 'aubiotrack', (track) ->
+    grunt.config 'trackPath', track.replace '.wav', ''
+    grunt.task.run 'shell:aubiotrack'
+    
+  grunt.task.registerTask 'writeAnalysis', ->
+    analysis.cwd = grunt.config 'trackPathCwd'
+    console.log analysis
+    json = JSON.stringify analysis, null, 2;
+    grunt.file.write 'audio/data-json/_analysis.json', json
+    console.log 'Tracks Analysed.'
+    
+  grunt.task.registerTask 'analysis', ->
+    opt = { cwd: grunt.config 'trackPathCwd' }
+    tracks = grunt.file.expand opt, '**/*.wav'
+
+    for track, i in tracks
+      grunt.task.run 'aubiotrack:' + track
+    grunt.task.run 'writeAnalysis'
+  
+  grunt.task.registerTask 'playlist', ->
+    #tmp
+  
+  grunt.initConfig  
+    # トラック解析のためのファイルパスの設定
+    trackPath: ''
+    trackPathCwd: 'audio/raw/tracks/'
+  
     compass:
       dist:
         options:
@@ -43,14 +76,13 @@ module.exports = (grunt)->
     
     shell:
       aubiotrack:
-        command: 'aubiotrack -i audio/wav/background.wav -O complexdomain'
+        command: 'aubiotrack -i <%= trackPathCwd + trackPath %>.wav -O complexdomain'
         options:
-          callback: writeBeatTime
+          stdout: false
+          callback: writeBeatTimes
     
     watch:
       options:
-        # http://feedback.livereload.com/knowledgebase/articles/86242
-        # if you want to use it with local files, be sure to enable “Allow access to file URLs” checkbox in Tools > Extensions > LiveReload after installation.
         livereload: true
       compass:
         files: ['scss/*.scss']
@@ -63,8 +95,5 @@ module.exports = (grunt)->
         tasks: ['concat:contrib']
       html:
         files: ['*.html']
-  
-  grunt.task.registerTask 'beat', ->
     
-    
-  grunt.task.registerTask 'default', ['compass', 'concat', 'watch']
+  grunt.task.registerTask 'default', ['compass', 'concat', 'shell', 'watch']

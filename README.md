@@ -5,7 +5,8 @@
 キャラクターとともに生成される音を楽しむWebアプリケーションです。
 
 ##動作環境
-Google Chrome（推奨）とSafariでのみ正常に動作します。最新版のChromeは[こちら](https://www.google.com/intl/ja/chrome/)からダウンロードできます。
+Web Audio APIに対応しているブラウザでのみ正常に動作します（[Can I use Web Audio API?](http://caniuse.com/audio-api)）。
+Google ChromeとSafariを推奨しています。最新版のChromeは[こちら](https://www.google.com/intl/ja/chrome/)からダウンロードできます。
 
 ##遊び方
 * **クリックするごとに、クリックした位置にキャラクターが登場します。**キャラクターはBGMのリズムに合わせて動き回ります。

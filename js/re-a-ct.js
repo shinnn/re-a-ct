@@ -98,39 +98,6 @@ function BufferLoader(audioContext, urlList, callback){
   
 }());
 
-/*
- * Copyright (c) 2012-2013 Shinnosuke Watanabe
- * https://github.com/shinnn
-*/
-
-//TODO: ref: https://developer.mozilla.org/ja/docs/DOM/Using_full-screen_mode
-$(function(){
-  function toggleFullscreen(){
-    if(document.webkitIsFullScreen){
-      document.webkitCancelFullScreen();
-    }else{
-      var body = document.getElementsByTagName('body')[0];
-      if(body.webkitRequestFullScreen){
-        console.log("\"webkitRequestFullScreen()\"");
-        body.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-      }else if(body.mozRequestFullScreen){
-        console.log("\"mozRequestFullScreen()\"");
-        body.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-      }else{
-        console.log("\"requestFullScreen()\"");
-        body.requestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-      }
-    }
-  }
-
-  Mousetrap.bind(['f', 'F'], toggleFullscreen);
-});
-
-/*
- * Copyright (c) 2012-2013 Shinnosuke Watanabe
- * github.com/shinnn
-*/
-
 (function(){
   this.AudioContext = this.AudioContext || this.webkitAudioContext;
   if(AudioContext === undefined){
@@ -159,18 +126,21 @@ $(function(){
     };
   }
   
-  var oscProto = tmpctx.createOscillator().constructor.prototype;
+  // Firefox 24 doesn't support OscilatorNode
+  if(typeof tmpctx.createOscillator === 'function'){
+    var oscProto = tmpctx.createOscillator().constructor.prototype;
   
-  if(isStillOld(oscProto.start, oscProto.noteOn) || isStillOld(oscProto.stop, oscProto.noteOff)){
-    var nativeCreateOscillator = AudioContext.prototype.createOscillator;
+    if(isStillOld(oscProto.start, oscProto.noteOn) || isStillOld(oscProto.stop, oscProto.noteOff)){
+      var nativeCreateOscillator = AudioContext.prototype.createOscillator;
 
-    AudioContext.prototype.createOscillator = function createOscillator(){
-      var returnNode = nativeCreateOscillator.call(this);
-      returnNode.start = returnNode.start || returnNode.noteOn;
-      returnNode.stop = returnNode.stop || returnNode.noteOff;
+      AudioContext.prototype.createOscillator = function createOscillator(){
+        var returnNode = nativeCreateOscillator.call(this);
+        returnNode.start = returnNode.start || returnNode.noteOn;
+        returnNode.stop = returnNode.stop || returnNode.noteOff;
         
-      return returnNode;
-    };
+        return returnNode;
+      };
+    }
   }
   
   if(AudioContext.prototype.createGain === undefined &&
@@ -230,7 +200,88 @@ $(function(){
 	
 }());
 
+/*
+ * Copyright (c) 2012-2013 Shinnosuke Watanabe
+ * https://github.com/shinnn
+*/
+
+//TODO: ref: https://developer.mozilla.org/ja/docs/DOM/Using_full-screen_mode
+$(function(){
+  function toggleFullscreen(){
+    if(document.webkitIsFullScreen){
+      document.webkitCancelFullScreen();
+    }else{
+      var body = document.getElementsByTagName('body')[0];
+      if(body.webkitRequestFullScreen){
+        console.log("\"webkitRequestFullScreen()\"");
+        body.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+      }else if(body.mozRequestFullScreen){
+        console.log("\"mozRequestFullScreen()\"");
+        body.mozRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+      }else{
+        console.log("\"requestFullScreen()\"");
+        body.requestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+      }
+    }
+  }
+
+  Mousetrap.bind(['f', 'F'], toggleFullscreen);
+});
+
+/*
+ * Copyright (c) 2012-2013 Shinnosuke Watanabe
+ * github.com/shinnn
+*/
+
 var ctx = new AudioContext();
+
+window.Dominant = function(audioContext){
+  //tmp
+};
+
+Dominant.createPlaylist = function(){
+  var Playlist = {};
+  Playlist.tracks = [];
+  Playlist.currentTrack = null;
+  Playlist.currentTime = 0;
+  
+  this.play = function(){
+    if(!!Playlist.currentTrack){
+      Playlist.currentTrack.play();      
+    }else{
+      if(Playlist.tracks.length > 0){
+        Playlist.tracks[0].play();
+        Playlist.currentTrack  = Playlist.tracks[0];
+      }
+    }
+  };
+  
+  Playlist.nextTrack = function(){
+    //tmp
+  };
+  
+  Playlist.prevTrack = function(){
+    //tmp
+  };
+  
+  Playlist.onplay = null;
+  Playlist.onpause = null;
+
+  return Playlist;
+};
+
+Dominant.loadPlaylist = function(){
+  var json;
+/*  
+  $.getJSON(
+    'audio/json/playlist.json',
+    function(data){
+      json = data[0].beat_times;    
+      interval = (beatMap[1] - beatMap[0]) * 1000;
+    }
+  );
+*/  
+};
 
 var panner;
 var bufferLoader;
@@ -336,11 +387,23 @@ $(function(){
   "beat9",
   "beat10"
   ];
-  
-  var preffix = 'audio/' + fileFormat + fileBitRate + '/';
+    
+  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': fileFormat+ '-') + fileBitRate + '/';
   var suffix = '.' + fileFormat;
   
-  bgloop.src = preffix + 'background' + suffix;
+  var path;
+  $.getJSON(
+    'audio/data-json/playlist.json',
+    function(data){
+      var path = data.cwd +
+                 data.src.template.replace('${format}', data.src.format[fileFormat]) +
+                 data.tracks[0].fileName + '.' + fileFormat;
+      console.log(path);
+      bgloop.src = path;
+    }
+  );
+  
+  bgloop.src = path;
   bgloop.autoplay = false;
   bgloop.loop = false;
   
@@ -353,7 +416,7 @@ $(function(){
   */
   
   for(var i=0; i < audioPath.length; i++){
-    audioPath[i] = preffix + audioPath[i] + suffix;
+    audioPath[i] = preffix + 'effects/' + audioPath[i] + suffix;
   }
   
   var pointingEvent;
@@ -541,20 +604,16 @@ var time = 0;
 
 var beatMap;
 $.getJSON(
-  'json/beat.json',
+  'audio/data-json/_analysis.json',
   function(data){
-    beatMap = data[0].beat_times;
-    
+    var json = data.tracks['main/background'];
+
+    beatMap = json.beat_times;    
     interval = (beatMap[1] - beatMap[0]) * 1000;
   }
 );
 
-var beatIndex = 0;
-
 //parameters
-var interval = 542; //542;
-//beatIndex++;
-var hitInterval = interval * 0.001 * 1/12 * 6;
 var movementRange = 500; //　一回の移動範囲
 
 var frog, released, varXY, hit, hitObj;

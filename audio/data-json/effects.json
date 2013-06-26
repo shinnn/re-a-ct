@@ -8,5 +8,11 @@
       "mp3": "compressed/mp3/",
       "ogg": "compressed/ogg/"
     }
-  }
+  },
+  "sounds": [
+    {
+      "fileName": "",
+      "title": ""
+    }
+  ]
 }

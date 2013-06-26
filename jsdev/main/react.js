@@ -158,7 +158,8 @@ $(function(){
   "beat10"
   ];
     
-  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': fileFormat+ '-') + fileBitRate + '/';
+  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat+ '-') +
+                fileBitRate + '/';
   var suffix = '.' + fileFormat;
   
   var path;

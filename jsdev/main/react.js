@@ -130,11 +130,15 @@ $(function(){
     fileFormat = 'wav';
 
   }else{
-    if(playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('ogg', 'vorbis')){
+    if(playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('webm', 'vorbis')){
       fileFormat = 'm4a';
       fileBitRate = 128;
+
+    }else if(playTypeLevel('webm', 'vorbis') >= playTypeLevel('ogg', 'vorbis')){
+        fileFormat = 'webm';
+      
     }else{
-      fileFormat = 'ogg';      
+      fileFormat = 'ogg';
     }
   }
   

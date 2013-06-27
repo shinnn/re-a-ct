@@ -21,7 +21,7 @@ module.exports = (grunt) ->
     beatPoint = beatArray[1]
     
     while beatPoint >= 0
-      beatArray.unshift ( beatPoint )
+      beatArray.unshift beatPoint
       beatPoint -= preBeat
     
     analysis.tracks[grunt.config 'trackPath'] =
@@ -36,7 +36,6 @@ module.exports = (grunt) ->
     
   grunt.task.registerTask 'writeAnalysis', ->
     analysis.cwd = grunt.config 'trackPathCwd'
-    console.log analysis
     json = JSON.stringify analysis, null, 2;
     grunt.file.write 'audio/data-json/_analysis.json', json
     console.log 'Tracks Analysed.'
@@ -51,6 +50,9 @@ module.exports = (grunt) ->
   
   grunt.task.registerTask 'playlist', ->
     #tmp
+  
+  grunt.task.registerTask 'encode', ->
+    
   
   grunt.initConfig  
     # トラック解析のためのファイルパスの設定
@@ -78,8 +80,9 @@ module.exports = (grunt) ->
       aubiotrack:
         command: 'aubiotrack -i <%= trackPathCwd + trackPath %>.wav -O complexdomain'
         options:
-          stdout: false
           callback: writeBeatTimes
+      webm:
+        command: 'ffmpeg -i piano.wav -vn -codec:a libvorbis -aq 1M output.webm'
     
     watch:
       options:

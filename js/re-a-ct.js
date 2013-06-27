@@ -356,7 +356,7 @@ $(function(){
       fileBitRate = 128;
     }
   
-  }else if(location.hostname === 'localhost'){
+  }else if(location.hostname === 'locaalhost'){
     fileFormat = 'wav';
 
   }else{
@@ -370,6 +370,10 @@ $(function(){
     }else{
       fileFormat = 'ogg';
     }
+  }
+  
+  if(fileBitRate){
+    fileBitRate = '-' + fileBitRate;
   }
   
   console.log(fileFormat + ' mode');
@@ -392,7 +396,7 @@ $(function(){
   "beat10"
   ];
     
-  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat + '-') +
+  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat) +
                 fileBitRate + '/';
   var suffix = '.' + fileFormat;
   
@@ -461,7 +465,7 @@ $(function(){
     Mousetrap.bind('space', pauseBGloop);
     
     function pauseBGloop(keyboardEvent){
-      if(keyboardEvent){
+      if(keyboardEvent && keyboardEvent.preventDefault){
         keyboardEvent.preventDefault();
       }
       if(timeoutId === false){
@@ -515,7 +519,7 @@ $(function(){
   }
 
   Mousetrap.bind(['m', 'M'], toggleRectStyle);
-  Mousetrap.trigger(['m', 'M']);
+  Mousetrap.trigger('M');
 });
 
 function playBass(timing){
@@ -622,6 +626,8 @@ $.getJSON(
 var movementRange = 500; //　一回の移動範囲
 
 var frog, released, varXY, hit, hitObj;
+
+
 //メインループ
 function schedule(){
   var currentTime = ctx.currentTime - startTime;
@@ -714,7 +720,7 @@ function schedule(){
           
           elm.style.opacity = opc + 0.2 + 0.1 * (10 - level); // opacity は 0 を超えないのでmax()は不要
           elm.style.webkitAnimation = 'none';
-          setTimeout(restartAnimation, 4/* + hit * hitInterval */, elm);
+          restartAnimation(elm);
           
           if(level === undefined){
             playBass(hitInterval * hit);
@@ -786,26 +792,44 @@ function schedule(){
   timeoutId = setTimeout(function(){ schedule(); }, 4);
 }
 
-function restartAnimation(elm){
-  elm.style.webkitAnimation = '';
-  
-  //波紋の描画
-  var ripple = document.createElement('div');
-  var rippleStyle = ripple.style;
-  
-  ripple.className = 'ripple';
-  
-  rippleStyle.width = varXY + 'px';
-  rippleStyle.height = varXY + 'px';
-  rippleStyle.borderRadius = varXY + 'px';
-  rippleStyle.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
-  rippleStyle.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
-  rippleStyle.webkitAnimationDuration = hit * hitInterval + 's';
 
-  rippleStyle.borderColor = colorOfLevel[elm.dataset.level];
+var restartAnimation = (function(){
+  var domAnimation = 'animation';
+  _st = document.createElement('div').style;
+  if(_st.webkitAnimation !== undefined){
+    domAnimation = 'webkitAnimation';
+  }else if(_st.mozAnimation !== undefined){
+    domAnimation = 'webkitAnimation';
+  }
+  console.log(domAnimation);
+  
+  var _reset = function(elm){
+    elm.style[domAnimation] = '';
 
-  parent.insertBefore(ripple, parent.childNodes[0]);
-}
+    //波紋の描画
+    var ripple = document.createElement('div');
+    var rippleStyle = ripple.style;
+
+    ripple.className = 'ripple';
+
+    rippleStyle.width = varXY + 'px';
+    rippleStyle.height = varXY + 'px';
+    rippleStyle.borderRadius = varXY + 'px';
+    rippleStyle.left = (parseFloat(elm.style.left) + (elm.offsetWidth - varXY) * 0.5) + 'px';
+    rippleStyle.top = (parseFloat(elm.style.top) + (elm.offsetHeight - varXY) * 0.5) + 'px';
+    rippleStyle[domAnimation + 'Duration'] = hit * hitInterval + 's';
+
+    rippleStyle.borderColor = colorOfLevel[elm.dataset.level];
+
+    parent.insertBefore(ripple, parent.childNodes[0]);
+  }
+  
+  return function(){
+    arguments[0].style[domAnimation] = 'none';
+    setTimeout(_reset, 4/* + hit * hitInterval */, arguments[0]);
+  }
+
+}());
 
 // Visualize
 
@@ -815,7 +839,11 @@ function createAnima(duration){
   
   var frog = document.createElement('div');
   frog.className = 'frog';
-  frog.innerText = 'o o'; //眼の描画
+  if(frog.textContent !== undefined){
+    frog.textContent = 'o o'; //眼の描画    
+  }else{
+    frog.innerText = 'o o'; //眼の描画    
+  }
   frog.style.left = initX + 'px';
   frog.style.top = initY + 'px';
   if(isMobile){

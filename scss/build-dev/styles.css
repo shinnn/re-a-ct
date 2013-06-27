@@ -1,0 +1,415 @@
+@charset "UTF-8";
+/* line 1, ../_interface.scss */
+#side-menu {
+  position: absolute;
+  top: 0px;
+  width: 300px;
+  height: 100%;
+  background: none #EEEEEE;
+}
+
+/* line 9, ../_interface.scss */
+#waveform {
+  width: 250px;
+  height: 250px;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+/* line 16, ../_interface.scss */
+.tracklist {
+  width: 250px;
+  list-style-type: none;
+}
+/* line 20, ../_interface.scss */
+.tracklist li {
+  height: 89px;
+  margin-bottom: 4px;
+  background: none #AAAAAA;
+}
+
+/* line 27, ../_interface.scss */
+#track-control {
+  float: left;
+  width: 250px;
+  height: 85px;
+  margin: 0 0 0 0;
+  color: white;
+  font-family: 'player';
+}
+/* line 35, ../_interface.scss */
+#track-control div {
+  float: left;
+  cursor: pointer;
+  margin-left: 18px;
+}
+
+/* line 42, ../_interface.scss */
+#track-control-back, #track-control-next, #track-control-repeat {
+  width: 40px;
+  font-size: 40px;
+  line-height: 1.2em;
+}
+/* line 47, ../_interface.scss */
+#track-control-back.disabled, #track-control-next.disabled, #track-control-repeat.disabled {
+  color: #666666;
+}
+
+/* line 52, ../_interface.scss */
+#track-control-pause {
+  width: 36px;
+  font-size: 65px;
+  line-height: 0.75em;
+}
+
+/* line 61, ../_interface.scss */
+#volume {
+  width: 200px;
+  height: 85px;
+  margin: 0px 0 0 0;
+  float: left;
+}
+
+/* line 68, ../_interface.scss */
+#bg_volume, #se_volume {
+  width: 150px;
+  height: 20px;
+  margin: 0 0 10px 0;
+  float: none;
+  position: relative;
+}
+
+/* line 76, ../_interface.scss */
+.info-text {
+  float: left;
+  color: white;
+}
+
+/* line 81, ../_interface.scss */
+#time-control {
+  float: left;
+  width: 800px;
+  height: 100px;
+  margin: 0 0 0 0;
+  color: white;
+  font-family: 'player';
+  font-size: 30px;
+}
+/* line 90, ../_interface.scss */
+#time-control div {
+  float: left;
+  cursor: pointer;
+}
+/* line 95, ../_interface.scss */
+#time-control section {
+  width: 600px;
+  height: 30px;
+  margin: 0 0 10px 0;
+  float: left;
+  position: relative;
+}
+/* line 102, ../_interface.scss */
+#time-control section .slider {
+  width: 550px;
+}
+
+/* line 108, ../_interface.scss */
+#time-counter {
+  float: left;
+  margin-top: -10px;
+}
+
+/* line 113, ../_interface.scss */
+.slider {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #333 #333 #777 #333;
+  border-radius: 25px;
+  width: 110px;
+  position: absolute;
+  height: 13px;
+  background-color: #8e8d8d;
+  background: url("../img/bg-track.png") repeat top left;
+  box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
+  left: 20px;
+}
+
+/* line 127, ../_interface.scss */
+.tooltip {
+  position: absolute;
+  display: block;
+  top: -25px;
+  width: 35px;
+  height: 20px;
+  color: #fff;
+  text-align: center;
+  font: 10pt Tahoma, Arial, sans-serif;
+  border-radius: 3px;
+  border: 1px solid #333;
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  background: -webkit-linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* IE10+ */
+  background: linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
+  /* W3C */
+}
+
+/* line 145, ../_interface.scss */
+.icon_volume {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 25px;
+  height: 25px;
+  right: -15px;
+  background: url("../img/volume.png") no-repeat 0 -75px;
+  margin-top: -5px;
+}
+
+/* line 155, ../_interface.scss */
+.ui-slider-handle {
+  position: absolute;
+  z-index: 2;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  background: url("../img/handle.png") no-repeat 50% 50%;
+  font-weight: bold;
+  color: #1C94C4;
+  outline: none;
+  top: -7px;
+  margin-left: -12px;
+}
+
+/* line 168, ../_interface.scss */
+.ui-slider-range {
+  background: #ffffff;
+  /* Old browsers */
+  background: linear-gradient(top, #ffffff 0%, #eaeaea 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eaeaea',GradientType=0 );
+  /* IE6-9 */
+  position: absolute;
+  border: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 25px;
+}
+
+@font-face {
+  font-family: 'player';
+  src: url("../font/player/player.eot?38789062");
+  src: url("../font/player/player.eot?38789062#iefix") format("embedded-opentype"), url("../font/player/player.woff?38789062") format("woff"), url("../font/player/player.ttf?38789062") format("truetype"), url("../font/player/player.svg?38789062#player") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'player';
+    src: url('../font/player.svg?38789062#player') format('svg');
+  }
+}
+*/
+/* line 22, ../_font.player.scss */
+.icon-pause:before {
+  content: '\2389';
+}
+
+/* '⎉' */
+/* line 23, ../_font.player.scss */
+.icon-fast-forward:before {
+  content: '\23e9';
+}
+
+/* '⏩' */
+/* line 24, ../_font.player.scss */
+.icon-fast-backward:before {
+  content: '\23ea';
+}
+
+/* '⏪' */
+/* line 25, ../_font.player.scss */
+.icon-stop:before {
+  content: '\25a0';
+}
+
+/* '■' */
+/* line 26, ../_font.player.scss */
+.icon-play:before {
+  content: '\25b6';
+}
+
+/* '▶' */
+/* line 27, ../_font.player.scss */
+.icon-loop:before {
+  content: '🔁';
+}
+
+/* '\1f501' */
+@font-face {
+  font-family: 'player';
+  src: url("../font/player/player.eot?38789062");
+  src: url("../font/player/player.eot?38789062#iefix") format("embedded-opentype"), url("../font/player/player.woff?38789062") format("woff"), url("../font/player/player.ttf?38789062") format("truetype"), url("../font/player/player.svg?38789062#player") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'player';
+    src: url('../font/player.svg?38789062#player') format('svg');
+  }
+}
+*/
+/* line 22, ../_font.player.scss */
+.icon-pause:before {
+  content: '\2389';
+}
+
+/* '⎉' */
+/* line 23, ../_font.player.scss */
+.icon-fast-forward:before {
+  content: '\23e9';
+}
+
+/* '⏩' */
+/* line 24, ../_font.player.scss */
+.icon-fast-backward:before {
+  content: '\23ea';
+}
+
+/* '⏪' */
+/* line 25, ../_font.player.scss */
+.icon-stop:before {
+  content: '\25a0';
+}
+
+/* '■' */
+/* line 26, ../_font.player.scss */
+.icon-play:before {
+  content: '\25b6';
+}
+
+/* '▶' */
+/* line 27, ../_font.player.scss */
+.icon-loop:before {
+  content: '🔁';
+}
+
+/* '\1f501' */
+/* line 9, ../styles.scss */
+html, body, #container, #frogLayer, #rippleLayer {
+  background: #FBFBFB;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+/* line 15, ../styles.scss */
+html ::selection, body ::selection, #container ::selection, #frogLayer ::selection, #rippleLayer ::selection {
+  background-color: transparent;
+}
+
+/* line 20, ../styles.scss */
+#welcome {
+  display: none;
+  position: fixed;
+  bottom: 40%;
+  left: 50%;
+  width: 1000px;
+  height: 700px;
+  font-weight: bold;
+}
+
+/* line 30, ../styles.scss */
+footer {
+  position: fixed;
+  bottom: -150px;
+  width: 100%;
+  height: 120px;
+  padding: 20px 20px 0 20px;
+  background: #0B0B0B;
+}
+
+/* line 42, ../styles.scss */
+.frog {
+  position: absolute;
+  opacity: 0;
+  width: 33px;
+  height: 93px;
+  background: url(../img/rev.png) 50% 50% no-repeat;
+  background-size: contain;
+  font-size: 0px;
+}
+
+@keyframes swell {
+  /* line 58, ../styles.scss */
+  0% {
+    padding: 0;
+  }
+
+  /* line 61, ../styles.scss */
+  50% {
+    padding: 10px;
+  }
+
+  /* line 64, ../styles.scss */
+  100% {
+    padding: 0;
+  }
+}
+
+/* line 69, ../styles.scss */
+.released {
+  width: 33px;
+  height: 93px;
+  animation-name: 'swell';
+  animation-duration: 0.3794s;
+  animation-timing-function: ease;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+
+@keyframes ripple {
+  /* line 82, ../styles.scss */
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  /* line 86, ../styles.scss */
+  45% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+
+  /* line 91, ../styles.scss */
+  100% {
+    opacity: 0.9;
+    transform: scale(0);
+  }
+}
+
+/* line 98, ../styles.scss */
+.ripple {
+  animation-name: 'ripple';
+  animation-duration: 0.542s;
+  animation-timing-function: cubic-bezier(0.69, 0.14, 0.79, 0.9);
+  animation-iteration-count: 1;
+  animation-direction: reverse;
+  animation-fill-mode: backwards;
+  position: absolute;
+  opacity: 0;
+  border: blue 3px solid;
+}

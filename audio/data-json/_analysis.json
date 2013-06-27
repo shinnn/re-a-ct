@@ -1,4 +1,5 @@
 {
+  "cwd": "audio/raw/tracks",
   "tracks": {
     "__background": {
       "beat_times": [
@@ -324,6 +325,5 @@
         51.525078
       ]
     }
-  },
-  "cwd": "audio/raw/tracks/"
+  }
 }

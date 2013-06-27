@@ -6,6 +6,7 @@
       "wav": "raw/",
       "m4a": "compressed/m4a-128/",
       "mp3": "compressed/mp3/",
+      "webm": "compressed/webm/",
       "ogg": "compressed/ogg/"
     }
   },

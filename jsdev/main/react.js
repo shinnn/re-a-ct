@@ -142,7 +142,7 @@ $(function(){
     }
   }
   
-  if(fileBitRate){
+  if(fileBitRate !== ''){
     fileBitRate = '-' + fileBitRate;
   }
   

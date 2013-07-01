@@ -1,7 +1,7 @@
 module.exports = (grunt) ->
   devDeps = grunt.file.readJSON('package.json').devDependencies
   
-  for taskName, version of devDeps
+  for taskName of devDeps
     if 'grunt-' is taskName.substring 0, 6
       grunt.loadNpmTasks taskName
   
@@ -63,12 +63,14 @@ module.exports = (grunt) ->
     console.log "Encoding" + cfg('ffmpegPath') + ".wav..."
     grunt.task.run 'shell:ffmpeg'
   
+  # grut-contrib-copy の際のオプション
+  # destType 引数はオーディオファイルフォーマット
   copyOpt = (destType) ->
-      expand: true
-      cwd: 'audio/raw/'
-      src: ['**']
-      dest: "audio/compressed/#{ destType }/"
-      filter: 'isDirectory'
+    expand: true
+    cwd: 'audio/raw/'
+    src: ['**']
+    dest: "audio/compressed/#{ destType }/"
+    filter: 'isDirectory'
   
   grunt.initConfig
     # オーディオ解析のためのファイルパスの設定
@@ -84,8 +86,17 @@ module.exports = (grunt) ->
           callback: _aubiotrackCallback
       ffmpeg:
         # -y: Overwrite output files.
-        command: "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
-        -vn -codec:a libvorbis -aq 1M audio/compressed/webm/<%= ffmpegPath %>.webm"
+        command: [
+          # M4A
+          "afconvert <%= rawAudioCwd + ffmpegPath %>.wav -d aac -f m4af -u pgcm 2
+            -b 256000 -q 127 -s 2 audio/compressed/m4a/<%= ffmpegPath %>.m4a"
+          # WebM
+          "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
+            -vn -codec:a libvorbis -aq 1M audio/compressed/webm/<%= ffmpegPath %>.webm"
+          # Ogg
+          "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
+            -vn -codec:a libvorbis -qscale:a 10 audio/compressed/ogg/<%= ffmpegPath %>.ogg"
+          ].join '&&'
         options:
           callback: (err, stdout, stderr, cb) ->
             if stderr
@@ -104,8 +115,8 @@ module.exports = (grunt) ->
       compressed:
         files: [
           copyOpt 'webm'
-          copyOpt 'ogg'
           copyOpt 'm4a'
+          copyOpt 'ogg'
           copyOpt 'mp3'
         ]
         
@@ -132,9 +143,8 @@ module.exports = (grunt) ->
         src: ['jsdev/contrib/*.js']
         dest: 'js/contrib.js'
         
-    coffeelint:
-      grunt:
-        src: ['Gruntfile.coffee']
+    connect:
+      uses_defaults: {}
 
     watch:
       options:
@@ -155,5 +165,5 @@ module.exports = (grunt) ->
         files: ['*.html']
     
   grunt.task.registerTask 'default', [
-    'analysis', 'compass', 'concat', 'shell:coffeelint', 'watch'
+    'analysis', 'compass', 'concat', 'shell:coffeelint', 'connect', 'watch'
   ]

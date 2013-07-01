@@ -1,103 +1,3 @@
-// Fork from Chromium's 'Bufferloader' class
-// http://chromium.googlecode.com/svn/trunk/samples/audio/doc/loading-sounds.html
-
-function BufferLoader(audioContext, urlList, callback){
-  this.context = audioContext;
-  this.urlList = urlList;
-  this.onload = callback;
-  this.bufferList = [];
-  this.loadCount = 0;
-}
-
-(function(){
-  var is_iOS = navigator.userAgent.indexOf('like Mac OS X') !== -1;
-
-  BufferLoader.prototype.loadBuffer = function(url, index){
-    // Load buffer asynchronously
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.responseType = 'arraybuffer';
-    var loader = this;
-
-    // Asynchronously decode the audio file data in request.response
-    request.onload = function(){
-    
-      /*
-      void decodeAudioData(
-        ArrayBuffer audioData,
-        DecodeSuccessCallback successCallback,
-        optional DecodeErrorCallback errorCallback
-      );
-      */
-      loader.context.decodeAudioData(
-        getArrayBuffer(request.response),
-        function successCallback(buffer){
-          if(! buffer){
-            alert('error decoding file data: '+url);
-            return;
-          }
-          loader.bufferList[index] = buffer;
-          if(++loader.loadCount == loader.urlList.length){
-            loader.onload(loader.bufferList);
-          }
-        },
-        function errorCallback(error){
-          console.error('decodeAudioData error', error);
-        }
-      );
-    };
-  
-    request.onerror = function(){
-      alert('BufferLoader: XHR error');
-    };
-    
-    request.send();
-  };
-  
-  var getArrayBuffer;
-  if(is_iOS){
-    // http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-    var ab2str = function(buf){
-      // 上述のURLの例のとおり String.fromCharCode.apply(null, new Uint8Array(buf)) とすると
-      // 'Maximum call stack size exceeded' が発生するため、下記のように処理する
-      
-      var arr = new Uint8Array(buf);
-      var str = '';
-      for(var i=0, len=arr.length; i<len; i++){
-        str += String.fromCharCode(arr[i]);
-      }
-      return str;
-    };
-
-    var str2ab = function(str){
-      var buf = new ArrayBuffer(str.length * Uint8Array.BYTES_PER_ELEMENT); // BYTES_... = 1
-      var bufView = new Uint8Array(buf);
-      for (var i=0, len=str.length; i<len; i++){
-        bufView[i] = str.charCodeAt(i);
-      }
-      return buf;
-    };
-    
-    getArrayBuffer = function(response){
-      // iOSでは、XHRで取得した ArrayBuffer を直接デコードすることができない。
-      // 一度 ArrayBuffer を String に変換し、再度 ArrayBuffer 化したものをデコードする。
-      return str2ab(ab2str(response));
-    };
-    
-  }else{
-    getArrayBuffer = function(response){
-      return response;
-    };
-  }
-
-  BufferLoader.prototype.load = function(){
-    for(var i=0; i < this.urlList.length; ++i){
-      this.loadBuffer(this.urlList[i], i);
-    }
-  };
-  
-}());
-
 (function(){
   this.AudioContext = this.AudioContext || this.webkitAudioContext;
   if(AudioContext === undefined){
@@ -198,6 +98,106 @@ function BufferLoader(audioContext, urlList, callback){
     };
   }
 	
+}());
+
+// Fork from Chromium's 'Bufferloader' class
+// http://chromium.googlecode.com/svn/trunk/samples/audio/doc/loading-sounds.html
+
+function BufferLoader(audioContext, urlList, callback){
+  this.context = audioContext;
+  this.urlList = urlList;
+  this.onload = callback;
+  this.bufferList = [];
+  this.loadCount = 0;
+}
+
+(function(){
+  var is_iOS = navigator.userAgent.indexOf('like Mac OS X') !== -1;
+
+  BufferLoader.prototype.loadBuffer = function(url, index){
+    // Load buffer asynchronously
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+    var loader = this;
+
+    // Asynchronously decode the audio file data in request.response
+    request.onload = function(){
+    
+      /*
+      void decodeAudioData(
+        ArrayBuffer audioData,
+        DecodeSuccessCallback successCallback,
+        optional DecodeErrorCallback errorCallback
+      );
+      */
+      loader.context.decodeAudioData(
+        getArrayBuffer(request.response),
+        function successCallback(buffer){
+          if(! buffer){
+            alert('error decoding file data: '+url);
+            return;
+          }
+          loader.bufferList[index] = buffer;
+          if(++loader.loadCount == loader.urlList.length){
+            loader.onload(loader.bufferList);
+          }
+        },
+        function errorCallback(error){
+          console.error('decodeAudioData error', error);
+        }
+      );
+    };
+  
+    request.onerror = function(){
+      alert('BufferLoader: XHR error');
+    };
+    
+    request.send();
+  };
+  
+  var getArrayBuffer;
+  if(is_iOS){
+    // http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+    var ab2str = function(buf){
+      // 上述のURLの例のとおり String.fromCharCode.apply(null, new Uint8Array(buf)) とすると
+      // 'Maximum call stack size exceeded' が発生するため、下記のように処理する
+      
+      var arr = new Uint8Array(buf);
+      var str = '';
+      for(var i=0, len=arr.length; i<len; i++){
+        str += String.fromCharCode(arr[i]);
+      }
+      return str;
+    };
+
+    var str2ab = function(str){
+      var buf = new ArrayBuffer(str.length * Uint8Array.BYTES_PER_ELEMENT); // BYTES_... = 1
+      var bufView = new Uint8Array(buf);
+      for (var i=0, len=str.length; i<len; i++){
+        bufView[i] = str.charCodeAt(i);
+      }
+      return buf;
+    };
+    
+    getArrayBuffer = function(response){
+      // iOSでは、XHRで取得した ArrayBuffer を直接デコードすることができない。
+      // 一度 ArrayBuffer を String に変換し、再度 ArrayBuffer 化したものをデコードする。
+      return str2ab(ab2str(response));
+    };
+    
+  }else{
+    getArrayBuffer = function(response){
+      return response;
+    };
+  }
+
+  BufferLoader.prototype.load = function(){
+    for(var i=0; i < this.urlList.length; ++i){
+      this.loadBuffer(this.urlList[i], i);
+    }
+  };
+  
 }());
 
 /*
@@ -348,21 +348,19 @@ $(function(){
     return 0;
   }
   
-  var fileFormat, fileBitRate = '';
+  var fileFormat, fileBitRate;
 	
   if(isMobile){
     if(playTypeLevel('mp4', 'mp4a.40.5') > 0){
       fileFormat = 'm4a';
-      fileBitRate = 128;
     }
   
-  }else if(location.hostname === 'locaalhost'){
+  }else if(false && location.hostname === 'localhost'){
     fileFormat = 'wav';
 
   }else{
     if(playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('webm', 'vorbis')){
       fileFormat = 'm4a';
-      fileBitRate = 128;
 
     }else if(playTypeLevel('webm', 'vorbis') >= playTypeLevel('ogg', 'vorbis')){
         fileFormat = 'webm';
@@ -370,10 +368,6 @@ $(function(){
     }else{
       fileFormat = 'ogg';
     }
-  }
-  
-  if(fileBitRate !== ''){
-    fileBitRate = '-' + fileBitRate;
   }
   
   console.log(fileFormat + ' mode');
@@ -396,8 +390,7 @@ $(function(){
   "beat10"
   ];
     
-  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat) +
-                fileBitRate + '/';
+  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat) + '/';
   var suffix = '.' + fileFormat;
   
   var path;
@@ -407,7 +400,6 @@ $(function(){
       var path = data.cwd +
                  data.src.template.replace('${format}', data.src.format[fileFormat]) +
                  data.tracks[0].fileName + '.' + fileFormat;
-      console.log(path);
       bgloop.src = path;
     }
   );

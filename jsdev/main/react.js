@@ -118,21 +118,19 @@ $(function(){
     return 0;
   }
   
-  var fileFormat, fileBitRate = '';
+  var fileFormat, fileBitRate;
 	
   if(isMobile){
     if(playTypeLevel('mp4', 'mp4a.40.5') > 0){
       fileFormat = 'm4a';
-      fileBitRate = 128;
     }
   
-  }else if(location.hostname === 'locaalhost'){
+  }else if(false && location.hostname === 'localhost'){
     fileFormat = 'wav';
 
   }else{
     if(playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('webm', 'vorbis')){
       fileFormat = 'm4a';
-      fileBitRate = 128;
 
     }else if(playTypeLevel('webm', 'vorbis') >= playTypeLevel('ogg', 'vorbis')){
         fileFormat = 'webm';
@@ -140,10 +138,6 @@ $(function(){
     }else{
       fileFormat = 'ogg';
     }
-  }
-  
-  if(fileBitRate !== ''){
-    fileBitRate = '-' + fileBitRate;
   }
   
   console.log(fileFormat + ' mode');
@@ -166,8 +160,7 @@ $(function(){
   "beat10"
   ];
     
-  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat) +
-                fileBitRate + '/';
+  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat) + '/';
   var suffix = '.' + fileFormat;
   
   var path;
@@ -177,7 +170,6 @@ $(function(){
       var path = data.cwd +
                  data.src.template.replace('${format}', data.src.format[fileFormat]) +
                  data.tracks[0].fileName + '.' + fileFormat;
-      console.log(path);
       bgloop.src = path;
     }
   );

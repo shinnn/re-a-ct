@@ -5,9 +5,10 @@ module.exports = (grunt) ->
     if 'grunt-' is taskName.substring 0, 6
       grunt.loadNpmTasks taskName
   
+  # alias
   cfg = grunt.config
   
-  # 出力するトラック解析結果を格納するオブジェクト
+  # トラック解析結果を格納するオブジェクト
   analysis =
     cwd: 'audio/raw/tracks'
     tracks: {}
@@ -87,15 +88,15 @@ module.exports = (grunt) ->
       ffmpeg:
         # -y: Overwrite output files.
         command: [
-          # M4A
-          "afconvert <%= rawAudioCwd + ffmpegPath %>.wav -d aac -f m4af -u pgcm 2
-            -b 256000 -q 127 -s 2 audio/compressed/m4a/<%= ffmpegPath %>.m4a"
-          # WebM
-          "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
-            -vn -codec:a libvorbis -aq 1M audio/compressed/webm/<%= ffmpegPath %>.webm"
-          # Ogg
-          "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
-            -vn -codec:a libvorbis -qscale:a 10 audio/compressed/ogg/<%= ffmpegPath %>.ogg"
+            # M4A
+            "afconvert <%= rawAudioCwd + ffmpegPath %>.wav -d aac -f m4af -u pgcm 2
+              -b 256000 -q 127 -s 2 audio/compressed/m4a/<%= ffmpegPath %>.m4a"
+            # WebM
+            "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
+              -vn -codec:a libvorbis -aq 1M audio/compressed/webm/<%= ffmpegPath %>.webm"
+            # Ogg
+            "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
+              -vn -codec:a libvorbis -qscale:a 10 audio/compressed/ogg/<%= ffmpegPath %>.ogg"
           ].join '&&'
         options:
           callback: (err, stdout, stderr, cb) ->
@@ -117,7 +118,7 @@ module.exports = (grunt) ->
           copyOpt 'webm'
           copyOpt 'm4a'
           copyOpt 'ogg'
-          copyOpt 'mp3'
+          #copyOpt 'mp3'
         ]
         
     compass:

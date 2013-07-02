@@ -1,15 +1,23 @@
 // Fork from Chromium's 'Bufferloader' class
 // http://chromium.googlecode.com/svn/trunk/samples/audio/doc/loading-sounds.html
 
-function BufferLoader(audioContext, urlList, callback){
-  this.context = audioContext;
-  this.urlList = urlList;
-  this.onload = callback;
-  this.bufferList = [];
-  this.loadCount = 0;
-}
-
 (function(){
+  var _dir, _ext;
+  
+  this.BufferLoader = function(audioContext, dir, fileNames, ext, callback){
+    this.context = audioContext;
+    this.fileList = fileNames;
+    this.onload = callback;
+    this.bufferList = [];
+    this.loadCount = 0;
+    this.getBufferFromName = function(name){
+      var _index = this.fileList.indexOf(name);
+      return this.bufferList[_index];
+    };
+    
+    _dir = dir, _ext = ext;
+  };  
+  
   var is_iOS = navigator.userAgent.indexOf('like Mac OS X') !== -1;
 
   BufferLoader.prototype.loadBuffer = function(url, index){
@@ -37,7 +45,7 @@ function BufferLoader(audioContext, urlList, callback){
             return;
           }
           loader.bufferList[index] = buffer;
-          if(++loader.loadCount == loader.urlList.length){
+          if(++loader.loadCount == loader.fileList.length){
             loader.onload(loader.bufferList);
           }
         },
@@ -91,8 +99,11 @@ function BufferLoader(audioContext, urlList, callback){
   }
 
   BufferLoader.prototype.load = function(){
-    for(var i=0; i < this.urlList.length; ++i){
-      this.loadBuffer(this.urlList[i], i);
+    for(var i=0; i < this.fileList.length; ++i){
+      this.loadBuffer(
+        _dir + this.fileList[i] + '.' + _ext,
+        i
+      );
     }
   };
   

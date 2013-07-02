@@ -1,0 +1,12 @@
+{
+  "cwd": "audio/",
+  "tracks": "{format}tracks/",
+  "effects": "{format}effects/",
+  "format": {
+    "wav": "raw/",
+    "m4a": "compressed/m4a/",
+    "mp3": "compressed/mp3/",
+    "webm": "compressed/webm/",
+    "ogg": "compressed/ogg/"
+  }
+}

@@ -42,15 +42,6 @@ Dominant.createPlaylist = function(){
 
 Dominant.loadPlaylist = function(){
   var json;
-/*  
-  $.getJSON(
-    'audio/json/playlist.json',
-    function(data){
-      json = data[0].beat_times;    
-      interval = (beatMap[1] - beatMap[0]) * 1000;
-    }
-  );
-*/  
 };
 
 var panner;
@@ -93,6 +84,18 @@ var colorOfLevel = [
 
 var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
 navigator.userAgent.indexOf('Android') !== -1);
+
+var src;
+
+
+$.ajax({
+  url: 'audio/data-json/src.json',
+  dataType: 'json',
+  async: false,
+  success: function(data){
+    src = data;
+  }
+});
 
 $(function(){
   analyzer = ctx.createAnalyser();
@@ -143,32 +146,32 @@ $(function(){
   console.log(fileFormat + ' mode');
   
   var audioPath = [
-  "beat",
-  "piano",
-  "piano2",
-  "pad",
-  "beat0",
-  "beat1",
-  "beat2",
-  "beat3",
-  "beat4",
-  "beat5",
-  "beat6",
-  "beat7",
-  "beat8",
-  "beat9",
-  "beat10"
+    "beat",
+    "piano",
+    "piano2",
+    "pad",
+    "beat0",
+    "beat1",
+    "beat2",
+    "beat3",
+    "beat4",
+    "beat5",
+    "beat6",
+    "beat7",
+    "beat8",
+    "beat9",
+    "beat10"
   ];
     
-  var preffix = 'audio/' + (fileFormat === 'wav'? 'raw': 'compressed/' + fileFormat) + '/';
+  var preffix = src.cwd + src.format[fileFormat];
   var suffix = '.' + fileFormat;
   
   var path;
   $.getJSON(
     'audio/data-json/playlist.json',
     function(data){
-      var path = data.cwd +
-                 data.src.template.replace('${format}', data.src.format[fileFormat]) +
+      var path = src.cwd +
+                 src.tracks.replace('{format}', src.format[fileFormat]) +
                  data.tracks[0].fileName + '.' + fileFormat;
       bgloop.src = path;
     }
@@ -185,11 +188,7 @@ $(function(){
     bgsource.connect(analyzer);  
   }, false);
   */
-  
-  for(var i=0; i < audioPath.length; i++){
-    audioPath[i] = preffix + 'effects/' + audioPath[i] + suffix;
-  }
-  
+    
   var pointingEvent;
   if(parent.ontouchstart !== undefined){
     pointingEvent = 'touchstart';
@@ -200,7 +199,9 @@ $(function(){
   }
     
   //Load Audio Files
-  bufferLoader = new BufferLoader(ctx, audioPath, bufferLoaderCallback);
+  bufferLoader = new BufferLoader(
+    ctx, preffix + 'effects/', audioPath, fileFormat, bufferLoaderCallback
+  );
   bufferLoader.load();
   
   function bufferLoaderCallback(){
@@ -345,7 +346,7 @@ function playBass10(timing){
 }
 
 function playPiano(panX){
-  src = playSound(bufferLoader.bufferList[1], panner, 0);
+  var src = playSound(bufferLoader.bufferList[1], panner, 0);
   createAnima(src.buffer.duration, animaX, animaY);
 }
 
@@ -434,7 +435,7 @@ function schedule(){
       var elm, obj, level, varX, varY;
       var inW = window.innerWidth, inH = window.innerHeight;
       //each method start
-      for(var i=0, len = released.length; i < len; i++){
+      for(i=0, len = released.length; i < len; i++){
         var current = i + Math.round(Math.random());
         elm = released[i], obj = $(elm);
         level = elm.dataset.level;
@@ -447,7 +448,6 @@ function schedule(){
           varX = varX * 1.5 + 50;
           varY = varY * 1.5 + 50;
         }
-        
         
         //画面外のオブジェクトの早期消去
         if(parseFloat(elm.style.left) < 0 || inW < parseFloat(elm.style.left) ||
@@ -584,12 +584,12 @@ var restartAnimation = (function(){
     rippleStyle.borderColor = colorOfLevel[elm.dataset.level];
 
     parent.insertBefore(ripple, parent.childNodes[0]);
-  }
+  };
   
   return function(){
     arguments[0].style[domAnimation] = 'none';
     setTimeout(_reset, 4/* + hit * hitInterval */, arguments[0]);
-  }
+  };
 
 }());
 

@@ -22,11 +22,12 @@
     "grunt-contrib-watch": "~0.4.4",
     "grunt-contrib-uglify": "~0.2.2",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-compass": "~0.3.0",
+    "grunt-contrib-compass": "~0.4.1",
     "grunt-contrib-jade": "~0.7.0",
-    "grunt-shell": "~0.3.0",
-    "grunt-coffeelint": "0.0.6",
+    "grunt-shell": "~0.3.1",
+    "grunt-coffeelint": "0.0.7",
     "grunt-contrib-copy": "~0.4.1",
-    "grunt-contrib-connect": "~0.3.0"
+    "grunt-contrib-connect": "~0.3.0",
+    "grunt-github-pages": "0.0.3"
   }
 }

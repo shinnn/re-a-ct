@@ -144,6 +144,7 @@ module.exports = (grunt) ->
           cwd: "public/"
           src: ['**']
           dest: DEST_ROOT
+          dot: true
         ]
 
         
@@ -199,6 +200,12 @@ module.exports = (grunt) ->
         files: ['jade/**/*.jade']
       html:
         files: ['*.html']
+    
+    githubPages:
+      site:
+        options:
+          commitMessage: 'auto commit by grunt-github-pages'
+        src: 'site'
     
   grunt.task.registerTask 'default', [
     'analysis',

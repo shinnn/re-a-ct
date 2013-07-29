@@ -1,2 +1,0 @@
-#JavaScript用フォルダ
-オリジナルのスクリプトはfunctions.js、fullscreen.jsの二つです。ほかはjQueryなどのライブラリです。

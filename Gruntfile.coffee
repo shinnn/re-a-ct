@@ -5,6 +5,12 @@ module.exports = (grunt) ->
     if 'grunt-' is taskName.substring 0, 6
       grunt.loadNpmTasks taskName
   
+  BIN = "#{ process.cwd() }/node_modules/.bin/"
+  
+  DEST_ROOT = 'site/'
+  
+  rawAudioCwd = 'audio/raw/'
+  
   # alias
   cfg = grunt.config
   
@@ -34,6 +40,7 @@ module.exports = (grunt) ->
   grunt.task.registerTask '_writeAnalysis', ->
     json = JSON.stringify analysis, null, 2
     grunt.file.write 'audio/data-json/_analysis.json', json
+    grunt.task.run 'copy:data'
     console.log "All Tracks Analysed."
     
   grunt.task.registerTask 'analysis', 'Analysing audio', ->
@@ -46,14 +53,14 @@ module.exports = (grunt) ->
   
   grunt.task.registerTask 'aubiotrack', (path) ->
     cfg 'trackPath', path.replace '.wav', ''
-    console.log "Analysing" + cfg('trackPath') + ".wav..."
+    console.log "Analysing #{ cfg('trackPath') }.wav..."
     grunt.task.run 'shell:aubiotrack'
   
   grunt.task.registerTask 'playlist', ->
     #tmp
   
   grunt.task.registerTask 'encode', ->
-    grunt.task.run 'copy'
+    grunt.task.run 'copy:audio'
     opt = { cwd: 'audio/raw/' }
     tracks = grunt.file.expand opt, '**/*.wav'
     for track in tracks
@@ -61,7 +68,7 @@ module.exports = (grunt) ->
 
   grunt.task.registerTask 'ffmpeg', (path) ->
     cfg 'ffmpegPath', path.replace '.wav', ''
-    console.log "Encoding" + cfg('ffmpegPath') + ".wav..."
+    console.log "Encoding " + cfg('ffmpegPath') + ".wav..."
     grunt.task.run 'shell:ffmpeg'
   
   # grut-contrib-copy の際のオプション
@@ -70,33 +77,32 @@ module.exports = (grunt) ->
     expand: true
     cwd: 'audio/raw/'
     src: ['**']
-    dest: "audio/compressed/#{ destType }/"
+    dest: "#{ DEST_ROOT }audio/compressed/#{ destType }/"
     filter: 'isDirectory'
   
   grunt.initConfig
     # オーディオ解析のためのファイルパスの設定
-    rawAudioCwd: 'audio/raw/'
     trackPath: ''
     ffmpegPath: ''
     
     # オーディオ関連の処理
     shell:
       aubiotrack:
-        command: "aubiotrack -i <%= rawAudioCwd + 'tracks/' + trackPath %>.wav -O complexdomain"
+        command: "aubiotrack -i #{ rawAudioCwd }tracks/<%= trackPath %>.wav -O complexdomain"
         options:
           callback: _aubiotrackCallback
       ffmpeg:
         # -y: Overwrite output files.
         command: [
             # M4A
-            "afconvert <%= rawAudioCwd + ffmpegPath %>.wav -d aac -f m4af -u pgcm 2
-              -b 256000 -q 127 -s 2 audio/compressed/m4a/<%= ffmpegPath %>.m4a"
+            "afconvert #{ rawAudioCwd }<%= ffmpegPath %>.wav -d aac -f m4af -u pgcm 2
+              -b 256000 -q 127 -s 2 #{ DEST_ROOT }audio/compressed/m4a/<%= ffmpegPath %>.m4a"
             # WebM
-            "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
-              -vn -codec:a libvorbis -aq 1M audio/compressed/webm/<%= ffmpegPath %>.webm"
+            "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
+              -vn -codec:a libvorbis -aq 1M #{ DEST_ROOT }audio/compressed/webm/<%= ffmpegPath %>.webm"
             # Ogg
-            "ffmpeg -y -i <%= rawAudioCwd + ffmpegPath %>.wav
-              -vn -codec:a libvorbis -qscale:a 10 audio/compressed/ogg/<%= ffmpegPath %>.ogg"
+            "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
+              -vn -codec:a libvorbis -qscale:a 10 #{ DEST_ROOT }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
           ].join '&&'
         options:
           callback: (err, stdout, stderr, cb) ->
@@ -108,44 +114,71 @@ module.exports = (grunt) ->
       
       coffeelint:
         command:
-          'coffeelint Gruntfile.coffee'
+          "#{ BIN }coffeelint Gruntfile.coffee"
         options:
           stdout: true
     
     copy:
-      compressed:
+      audio:
         files: [
           copyOpt 'webm'
           copyOpt 'm4a'
           copyOpt 'ogg'
-          #copyOpt 'mp3'
+          {
+            expand: true
+            cwd: "audio/raw/"
+            src: ['**']
+            dest: "#{ DEST_ROOT }audio/raw/"
+          }
         ]
+      data:
+        files: [
+          expand: true
+          cwd: "audio/data-json/"
+          src: ['**']
+          dest: "#{ DEST_ROOT }audio/data-json/"          
+        ]
+      public:
+        files: [
+          expand: true
+          cwd: "public/"
+          src: ['**']
+          dest: DEST_ROOT
+        ]
+
         
     compass:
       dist:
         options:
           sassDir: 'scss'
-          cssDir: 'css'
+          cssDir: "#{ DEST_ROOT }css"
           environment: 'production'
           outputStyle: 'compressed'
       dev:
         options:
           sassDir: 'scss'
-          cssDir: 'scss/build-dev/'
+          cssDir: "#{ DEST_ROOT }css"
           environment: 'development'
           outputStyle: 'expand'
       
     concat:
       main:
-        src: ['jsdev/main/*.js']
-        dest: 'js/re-a-ct.js'
+        src: ['js/main/*.js']
+        dest: "#{ DEST_ROOT }js/re-a-ct.js"
         
       contrib:
-        src: ['jsdev/contrib/*.js']
-        dest: 'js/contrib.js'
-        
+        src: ['js/contrib/*.js']
+        dest: "#{ DEST_ROOT }js/contrib.js"
+    
+    jade:
+      dist:
+        files:
+          "site/index.html": ['jade/index.jade']
+    
     connect:
-      uses_defaults: {}
+      server:
+        options:
+          base: DEST_ROOT
 
     watch:
       options:
@@ -154,17 +187,24 @@ module.exports = (grunt) ->
         files: ['scss/*.scss']
         tasks: ['compass']
       js_main:
-        files: ['jsdev/main/*.js']
+        files: ['js/main/*.js']
         tasks: ['concat:main']
       js_contrib:
-        files: ['jsdev/contrib/*.js']
+        files: ['js/contrib/*.js']
         tasks: ['concat:contrib']
       coffeelint:
         files: ['Gruntfile.coffee']
         tasks: ['shell:coffeelint']
+      jade:
+        files: ['jade/**/*.jade']
       html:
         files: ['*.html']
     
   grunt.task.registerTask 'default', [
-    'analysis', 'compass', 'concat', 'shell:coffeelint', 'connect', 'watch'
+    'analysis',
+    'compass',
+    'concat','shell:coffeelint',
+    'jade',
+    'copy:public'
+    'connect', 'watch'
   ]

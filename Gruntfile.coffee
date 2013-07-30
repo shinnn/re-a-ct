@@ -88,21 +88,25 @@ module.exports = (grunt) ->
     # オーディオ関連の処理
     shell:
       aubiotrack:
-        command: "aubiotrack -i #{ rawAudioCwd }tracks/<%= trackPath %>.wav -O complexdomain"
+        command: "aubiotrack -i
+                   #{ rawAudioCwd }tracks/<%= trackPath %>.wav -O complexdomain"
         options:
           callback: _aubiotrackCallback
       ffmpeg:
         # -y: Overwrite output files.
         command: [
             # M4A
-            "afconvert #{ rawAudioCwd }<%= ffmpegPath %>.wav -d aac -f m4af -u pgcm 2
-              -b 256000 -q 127 -s 2 #{ DEST_ROOT }audio/compressed/m4a/<%= ffmpegPath %>.m4a"
+            "afconvert #{ rawAudioCwd }<%= ffmpegPath %>.wav
+              -d aac -f m4af -u pgcm 2 -b 256000 -q 127 -s 2
+              #{ DEST_ROOT }audio/compressed/m4a/<%= ffmpegPath %>.m4a"
             # WebM
             "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
-              -vn -codec:a libvorbis -aq 1M #{ DEST_ROOT }audio/compressed/webm/<%= ffmpegPath %>.webm"
+              -vn -codec:a libvorbis -aq 1M
+              #{ DEST_ROOT }audio/compressed/webm/<%= ffmpegPath %>.webm"
             # Ogg
             "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
-              -vn -codec:a libvorbis -qscale:a 10 #{ DEST_ROOT }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
+              -vn -codec:a libvorbis -qscale:a 10
+              #{ DEST_ROOT }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
           ].join '&&'
         options:
           callback: (err, stdout, stderr, cb) ->
@@ -136,7 +140,7 @@ module.exports = (grunt) ->
           expand: true
           cwd: "audio/data-json/"
           src: ['**']
-          dest: "#{ DEST_ROOT }audio/data-json/"          
+          dest: "#{ DEST_ROOT }audio/data-json/"
         ]
       public:
         files: [
@@ -198,6 +202,7 @@ module.exports = (grunt) ->
         tasks: ['shell:coffeelint']
       jade:
         files: ['jade/**/*.jade']
+        tasks: ['jade']
       html:
         files: ['*.html']
     

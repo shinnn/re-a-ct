@@ -204,7 +204,7 @@ module.exports = (grunt) ->
         files: ['jade/**/*.jade']
         tasks: ['jade']
       html:
-        files: ['*.html']
+        files: ["#{ DEST_ROOT }*.html"]
     
     githubPages:
       site:

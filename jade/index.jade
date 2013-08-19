@@ -15,10 +15,11 @@ html(lang='ja')
 
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     meta(name='format-detection', content='telephone=no')
-    link(href='css/normalize.css', rel='stylesheet', media='screen')
+    link(href='css/normalize.css', rel='stylesheet', media=' all')
     link(href='css/styles.css', rel='stylesheet', media='screen')
   body
     include google-analytics
+
     #container
       #welcome
         | マウスで画面のどこかを
@@ -30,6 +31,7 @@ html(lang='ja')
         li 02 Song Name
         li 03 Song Name
       canvas#waveform
+    
     footer
       #track-control
         #track-control-back.icon-fast-backward
@@ -53,7 +55,21 @@ html(lang='ja')
           | &nbsp;/&nbsp;
           span 00:00
       #shortcut
-    script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js')
+    
+    mixin loadJQuery(version)
+      script(src='https://ajax.googleapis.com/ajax/libs/jquery/#{version}/jquery.min.js')
+
+      - var jQueryFallbacks = [];
+      - jQueryFallbacks[0] = 'http://code.jquery.com/jquery-' + version + '.min.js';
+      - jQueryFallbacks[1] = 'http://ajax.aspnetcdn.com/ajax/jQuery/jquery-' + version + '.min.js';
+      - jQueryFallbacks[2] = 'http://cdnjs.cloudflare.com/ajax/libs/jquery/' + version + '/jquery.min.js';
+      - jQueryFallbacks[3] = 'js/jquery' + (version.charAt(0) === '1'? '1': '') +'.js';
+  
+      each url in jQueryFallbacks
+        script.
+          window.jQuery || document.write('<script src=#{url}><\/script>');
+    
+    mixin loadJQuery('2.0.3')
     script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
     script(src='js/contrib.js')
     script(src='js/re-a-ct.js')

@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = (grunt) ->
   devDeps = grunt.file.readJSON('package.json').devDependencies
   
@@ -206,11 +208,17 @@ module.exports = (grunt) ->
       html:
         files: ["#{ DEST_ROOT }*.html"]
     
-    githubPages:
+    'gh-pages':
       site:
         options:
-          commitMessage: 'auto commit by grunt-github-pages'
-        src: 'site'
+          base: DEST_ROOT
+          branch: 'gh-pages'
+          message: 'auto commit by grunt-gh-pages'
+          user:
+            name: 'shinnn'
+            email: 'snnskwtnb@gmail.com'
+        src: '**/*'
+    
     
   grunt.task.registerTask 'default', [
     'analysis',

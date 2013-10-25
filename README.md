@@ -2,6 +2,8 @@
 
 # [re(a)ct - Sound Interaction Expreriment with HTML5 Web Audio API](http://shinnn.github.io/re-a-ct/)
 
+[![devDependency Status](https://david-dm.org/shinnn/re-a-ct/dev-status.png)](https://david-dm.org/shinnn/re-a-ct#info=devDependencies)
+
 キャラクターとともに生成される音を楽しむWebアプリケーションです。
 
 ## 動作環境

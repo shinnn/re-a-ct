@@ -219,7 +219,6 @@ module.exports = (grunt) ->
             email: 'snnskwtnb@gmail.com'
         src: '**/*'
     
-    
   grunt.task.registerTask 'default', [
     'analysis',
     'compass',

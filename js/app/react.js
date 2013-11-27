@@ -87,7 +87,6 @@ navigator.userAgent.indexOf('Android') !== -1);
 
 var src;
 
-
 $.ajax({
   url: 'audio/data-json/src.json',
   dataType: 'json',
@@ -98,6 +97,9 @@ $.ajax({
 });
 
 $(function(){
+  // フルスクリーン
+  Mousetrap.bind(['f', 'F'], screenfull.request);
+  
   analyzer = ctx.createAnalyser();
   analyzer.smoothingTimeConstant = 0.85;
   analyzer.connect(ctx.destination);

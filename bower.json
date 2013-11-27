@@ -1,0 +1,16 @@
+{
+  "name": "re-a-ct",
+  "version": "0.0.0",
+  "homepage": "https://github.com/shinnn/re-a-ct",
+  "authors": [
+    "Shinnosuke Watanabe <snnskwtnb@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "jquery": "latest",
+    "mousetrap": "latest",
+    "jquery-ui-touch-punch-amd": "latest",
+    "screenfull": "~1.1.0"
+  }
+}

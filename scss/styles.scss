@@ -1,12 +1,12 @@
 @charset "UTF-8";
 
+@import "normalize";
 @import "interface";
-@import "font.player";
 @import "font.player";
 
 $interval : 542 * 0.001;
 
-html, body, #container, #frogLayer, #rippleLayer{
+html, body, #container, #frogLayer, #rippleLayer {
   background: #FBFBFB;
 	width: 100%;
   height: 100%;
@@ -17,17 +17,17 @@ html, body, #container, #frogLayer, #rippleLayer{
   }
 }
 
-#welcome{
+#welcome {
   display: none;
   position: fixed;
   bottom: 40%;
   left: 50%;
   width: 1000px;
   height: 700px;
-  font-weight:bold;
+  font-weight: bold;
 }
 
-footer{
+footer {
   display: none;
   position: fixed;
   bottom: -150px;
@@ -37,10 +37,10 @@ footer{
   background: #0B0B0B;
 }
 
-$animaWidth : 40px;
-$animaHeight : 60px;
+$animaWidth: 40px;
+$animaHeight: 60px;
 
-.frog{
+.frog {
 	position: absolute;
 	opacity: 0;
 	width: 33px;
@@ -55,19 +55,19 @@ $animaHeight : 60px;
   //border: 1px #000000 solid; //デバッグ 当り判定確認用
 }
 
-@keyframes swell{
-	0%{
+@keyframes swell {
+	0% {
 		padding: 0;
 	}
-	50%{
+	50% {
 		padding: 10px;
 	}
-	100%{
+	100% {
 		padding: 0;
 	}
 }
 
-.released{
+.released {
   width: 33px;
   height: 93px;
 	animation-name: 'swell';
@@ -79,24 +79,24 @@ $animaHeight : 60px;
 }
 
 
-@keyframes ripple{
-	0%{
+@keyframes ripple {
+	0% {
 		opacity: 0;
 		transform: scale(1);
 	}
-	45%{
+	45% {
 		opacity: 0.2;
 		//transform: translate(150px, 150px);
 		transform: scale(0.8);
 	}
-	100%{
+	100% {
 		opacity: 0.9;
 		//transform: translate(0, 0);
 		transform: scale(0);
 	}
 }
 
-.ripple{
+.ripple {
 	animation-name: 'ripple';
 	animation-duration: $interval + s;
 	animation-timing-function: cubic-bezier(.69,.14,.79,.9);
@@ -109,6 +109,6 @@ $animaHeight : 60px;
   opacity: 0;
   //width: 300px;
   //height: 300px;
-	border:blue 3px solid;
+	border :blue 3px solid;
 	//border-radius: 150px;
 }

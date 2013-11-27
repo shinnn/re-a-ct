@@ -1,6 +1,6 @@
 .DS_Store
 .sass-cache
-開発
+bower_components
 site
 
 # Node

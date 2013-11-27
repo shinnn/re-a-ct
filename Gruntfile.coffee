@@ -1,11 +1,7 @@
 'use strict'
 
 module.exports = (grunt) ->
-  devDeps = grunt.file.readJSON('package.json').devDependencies
-  
-  for taskName of devDeps
-    if 'grunt-' is taskName.substring 0, 6
-      grunt.loadNpmTasks taskName
+  require('load-grunt-tasks')(grunt)
   
   BIN = "#{ process.cwd() }/node_modules/.bin/"
   
@@ -73,7 +69,7 @@ module.exports = (grunt) ->
     console.log "Encoding " + cfg('ffmpegPath') + ".wav..."
     grunt.task.run 'shell:ffmpeg'
   
-  # grut-contrib-copy の際のオプション
+  # grut-vendor-copy の際のオプション
   # destType 引数はオーディオファイルフォーマット
   copyOpt = (destType) ->
     expand: true
@@ -124,6 +120,14 @@ module.exports = (grunt) ->
         options:
           stdout: true
     
+    lodash:
+      options:
+        modifier: 'legacy'
+        #include: []
+        flags: ['--minify']
+      custom:
+        dest: 'js/vendor/lodash.gruntbuild.js'
+    
     copy:
       audio:
         files: [
@@ -148,12 +152,31 @@ module.exports = (grunt) ->
         files: [
           expand: true
           cwd: "public/"
-          src: ['**']
+          src: ['**', '!**/{.DS_Store,Thumbs.db}']
           dest: DEST_ROOT
           dot: true
         ]
+    
+    bower:
+      target:
+        rjsConfig: 'js/main.coffee'
+    
+    requirejs:
+      all:
+        options:
+          modules: [
+            name: 'main'
+            exclude: ['bower_components/jquery/jquery.min']
+          ]
+          baseUrl: 'js'
+          mainConfigFile: 'js/main.js'
+          dir: "#{ DEST_ROOT }js"
+          removeCombined: true
+          optimize: 'uglify2'
+          useStrict: true
+          preserveLicenseComments: true
+          wrap: true
 
-        
     compass:
       dist:
         options:
@@ -170,12 +193,12 @@ module.exports = (grunt) ->
       
     concat:
       main:
-        src: ['js/main/*.js']
+        src: ['js/app/*.js']
         dest: "#{ DEST_ROOT }js/re-a-ct.js"
         
-      contrib:
-        src: ['js/contrib/*.js']
-        dest: "#{ DEST_ROOT }js/contrib.js"
+      vendor:
+        src: ['js/vendor/*.js']
+        dest: "#{ DEST_ROOT }js/vendor.js"
     
     jade:
       dist:
@@ -194,11 +217,11 @@ module.exports = (grunt) ->
         files: ['scss/*.scss']
         tasks: ['compass']
       js_main:
-        files: ['js/main/*.js']
+        files: ['js/app/*.js']
         tasks: ['concat:main']
-      js_contrib:
-        files: ['js/contrib/*.js']
-        tasks: ['concat:contrib']
+      js_vendor:
+        files: ['js/vendor/*.js']
+        tasks: ['concat:vendor']
       coffeelint:
         files: ['Gruntfile.coffee']
         tasks: ['shell:coffeelint']
@@ -216,9 +239,8 @@ module.exports = (grunt) ->
           message: 'auto commit by grunt-gh-pages'
           user:
             name: 'shinnn'
-            email: 'snnskwtnb@gmail.com'
         src: '**/*'
-    
+      
   grunt.task.registerTask 'default', [
     'analysis',
     'compass',

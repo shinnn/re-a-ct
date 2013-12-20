@@ -1,11 +1,11 @@
-'use strict'
-
 module.exports = (grunt) ->
+  'use strict'
+
   require('load-grunt-tasks')(grunt)
   
   BIN = "#{ process.cwd() }/node_modules/.bin/"
   
-  DEST_ROOT = 'site/'
+  DEST = 'site/'
   
   rawAudioCwd = 'audio/raw/'
   
@@ -35,13 +35,13 @@ module.exports = (grunt) ->
     analysis.tracks[cfg 'trackPath'] = { beat_times: beatArray }
     cb()
 
-  grunt.task.registerTask '_writeAnalysis', ->
+  grunt.registerTask '_writeAnalysis', ->
     json = JSON.stringify analysis, null, 2
     grunt.file.write 'audio/data-json/_analysis.json', json
     grunt.task.run 'copy:data'
     console.log "All Tracks Analysed."
     
-  grunt.task.registerTask 'analysis', 'Analysing audio', ->
+  grunt.registerTask 'analysis', 'Analysing audio', ->
     opt = { cwd: analysis.cwd }
     tracks = grunt.file.expand opt, '**/*.wav'
     
@@ -49,24 +49,24 @@ module.exports = (grunt) ->
       grunt.task.run 'aubiotrack:' + track
     grunt.task.run '_writeAnalysis'
   
-  grunt.task.registerTask 'aubiotrack', (path) ->
+  grunt.registerTask 'aubiotrack', (path) ->
     cfg 'trackPath', path.replace '.wav', ''
     console.log "Analysing #{ cfg('trackPath') }.wav..."
     grunt.task.run 'shell:aubiotrack'
   
-  grunt.task.registerTask 'playlist', ->
+  grunt.registerTask 'playlist', ->
     #tmp
   
-  grunt.task.registerTask 'encode', ->
+  grunt.registerTask 'encode', ->
     grunt.task.run 'copy:audio'
     opt = { cwd: 'audio/raw/' }
     tracks = grunt.file.expand opt, '**/*.wav'
     for track in tracks
       grunt.task.run 'ffmpeg:' + track
 
-  grunt.task.registerTask 'ffmpeg', (path) ->
+  grunt.registerTask 'ffmpeg', (path) ->
     cfg 'ffmpegPath', path.replace '.wav', ''
-    console.log "Encoding " + cfg('ffmpegPath') + ".wav..."
+    console.log "Encoding #{ cfg('ffmpegPath') }.wav..."
     grunt.task.run 'shell:ffmpeg'
   
   # grut-vendor-copy の際のオプション
@@ -75,7 +75,7 @@ module.exports = (grunt) ->
     expand: true
     cwd: 'audio/raw/'
     src: ['**']
-    dest: "#{ DEST_ROOT }audio/compressed/#{ destType }/"
+    dest: "#{ DEST }audio/compressed/#{ destType }/"
     filter: 'isDirectory'
   
   grunt.initConfig
@@ -96,22 +96,20 @@ module.exports = (grunt) ->
             # M4A
             "afconvert #{ rawAudioCwd }<%= ffmpegPath %>.wav
               -d aac -f m4af -u pgcm 2 -b 256000 -q 127 -s 2
-              #{ DEST_ROOT }audio/compressed/m4a/<%= ffmpegPath %>.m4a"
+              #{ DEST }audio/compressed/m4a/<%= ffmpegPath %>.m4a"
             # WebM
             "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
               -vn -codec:a libvorbis -aq 1M
-              #{ DEST_ROOT }audio/compressed/webm/<%= ffmpegPath %>.webm"
+              #{ DEST }audio/compressed/webm/<%= ffmpegPath %>.webm"
             # Ogg
             "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
               -vn -codec:a libvorbis -qscale:a 10
-              #{ DEST_ROOT }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
+              #{ DEST }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
           ].join '&&'
         options:
           callback: (err, stdout, stderr, cb) ->
-            if stderr
-              console.log stderr
-            if stdout
-              console.log stdout
+            console.warn stderr if stderr
+            console.log stdout if stdout
             cb()
       
       coffeelint:
@@ -136,79 +134,95 @@ module.exports = (grunt) ->
           copyOpt 'ogg'
           {
             expand: true
-            cwd: "audio/raw/"
+            cwd: 'audio/raw/'
             src: ['**']
-            dest: "#{ DEST_ROOT }audio/raw/"
+            dest: "#{ DEST }audio/raw/"
           }
         ]
       data:
         files: [
           expand: true
-          cwd: "audio/data-json/"
+          cwd: 'audio/data-json/'
           src: ['**']
-          dest: "#{ DEST_ROOT }audio/data-json/"
+          dest: "#{ DEST }audio/data-json/"
         ]
       public:
         files: [
           expand: true
-          cwd: "public/"
+          cwd: 'public/'
           src: ['**', '!**/{.DS_Store,Thumbs.db}']
-          dest: DEST_ROOT
+          dest: DEST
           dot: true
         ]
     
     bower:
-      target:
-        rjsConfig: 'js/main.coffee'
+      options:
+        targetDir: "#{ DEST }.tmp/bower_exports/"
+        cleanTargetDir: true
+        bowerOptions:
+          production: true
+  
+      install: {}
     
-    requirejs:
-      all:
-        options:
-          modules: [
-            name: 'main'
-            exclude: ['bower_components/jquery/jquery.min']
-          ]
-          baseUrl: 'js'
-          mainConfigFile: 'js/main.js'
-          dir: "#{ DEST_ROOT }js"
-          removeCombined: true
-          optimize: 'uglify2'
-          useStrict: true
-          preserveLicenseComments: true
-          wrap: true
-
+    uglify:
+          options:
+            preserveComments: saveLicense
+          main:
+            options:
+              banner: "/*! Copyright (c) 2013 Shinnosuke Watanabe | MIT License */\n"
+              compress:
+                global_defs:
+                  DEBUG: false
+                dead_code: true
+            src: '<%= coffee.dist.dest %>'
+            dest: '<%= uglify.main.src %>'
+          bower:
+            options:
+              compress:
+                # For /*cc_on!*/ comments
+                dead_code: false
+            files: [
+              expand: true
+              cwd: '<%= bower.options.targetDir %>'
+              src: [
+                '{,*/,*/*/}*.js',
+                '!{,*/,*/*/}*{.min,-min}.js', '!debug/{,*/}*.js'
+              ]
+              dest: '<%= bower.options.targetDir %>'
+            ]
+    
     compass:
       dist:
         options:
           sassDir: 'scss'
-          cssDir: "#{ DEST_ROOT }css"
+          cssDir: "#{ DEST }css"
           environment: 'production'
           outputStyle: 'compressed'
       dev:
         options:
           sassDir: 'scss'
-          cssDir: "#{ DEST_ROOT }css"
+          cssDir: "#{ DEST }css"
           environment: 'development'
           outputStyle: 'expand'
       
     concat:
       main:
         src: ['js/app/*.js']
-        dest: "#{ DEST_ROOT }js/re-a-ct.js"
+        dest: "#{ DEST }js/re-a-ct.js"
         
       vendor:
         src: ['js/vendor/*.js']
-        dest: "#{ DEST_ROOT }js/vendor.js"
+        dest: "#{ DEST }js/vendor.js"
     
     jade:
       dist:
-        files:
-          "site/index.html": ['jade/index.jade']
+        src: ['jade/index.jade']
+        dest: "#{ DEST }index.html"
     
     connect:
       server:
         options:
-          base: DEST_ROOT
+          base: DEST
 
     watch:
       options:
@@ -217,7 +231,7 @@ module.exports = (grunt) ->
         files: ['scss/*.scss']
         tasks: ['compass']
       js_main:
-        files: ['js/app/*.js']
+        files: ['js/main/*.js']
         tasks: ['concat:main']
       js_vendor:
         files: ['js/vendor/*.js']
@@ -229,23 +243,23 @@ module.exports = (grunt) ->
         files: ['jade/**/*.jade']
         tasks: ['jade']
       html:
-        files: ["#{ DEST_ROOT }*.html"]
+        files: ["#{ DEST }*.html"]
     
     'gh-pages':
       site:
         options:
-          base: DEST_ROOT
+          base: DEST
           branch: 'gh-pages'
           message: 'auto commit by grunt-gh-pages'
           user:
             name: 'shinnn'
         src: '**/*'
       
-  grunt.task.registerTask 'default', [
-    'analysis',
-    'compass',
-    'concat','shell:coffeelint',
-    'jade',
+  grunt.registerTask 'default', [
+    'analysis'
+    'compass'
+    'concat', 'shell:coffeelint'
+    'jade'
     'copy:public'
     'connect', 'watch'
   ]

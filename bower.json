@@ -10,7 +10,8 @@
   "dependencies": {
     "jquery": "latest",
     "mousetrap": "latest",
-    "jquery-ui-touch-punch-amd": "latest",
-    "screenfull": "~1.1.0"
+    "jquery-ui-touch-punch": "latest",
+    "screenfull": "latest",
+    "audiocontext-polyfill": "latest"
   }
 }

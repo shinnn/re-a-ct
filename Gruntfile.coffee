@@ -159,17 +159,17 @@ module.exports = (grunt) ->
       options:
         targetDir: "#{ DEST }.tmp/bower_exports/"
         cleanTargetDir: true
-        bowerOptions:
-          production: true
-  
-      install: {}
+      install:
+        options:
+          bowerOptions:
+            production: true
     
     uglify:
           options:
             preserveComments: saveLicense
           main:
             options:
-              banner: "/*! Copyright (c) 2013 Shinnosuke Watanabe | MIT License */\n"
+              banner: "/*! Copyright (c) 2013 -2014 Shinnosuke Watanabe | MIT License */\n"
               compress:
                 global_defs:
                   DEBUG: false

@@ -166,7 +166,7 @@ module.exports = (grunt) ->
     
     uglify:
           options:
-            preserveComments: saveLicense
+            preserveComments: require 'uglify-save-license'
           main:
             options:
               banner: "/*! Copyright (c) 2013 -2014 Shinnosuke Watanabe | MIT License */\n"

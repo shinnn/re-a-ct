@@ -165,31 +165,31 @@ module.exports = (grunt) ->
             production: true
     
     uglify:
-          options:
-            preserveComments: require 'uglify-save-license'
-          main:
-            options:
-              banner: "/*! Copyright (c) 2013 -2014 Shinnosuke Watanabe | MIT License */\n"
-              compress:
-                global_defs:
-                  DEBUG: false
-                dead_code: true
-            src: '<%= coffee.dist.dest %>'
-            dest: '<%= uglify.main.src %>'
-          bower:
-            options:
-              compress:
-                # For /*cc_on!*/ comments
-                dead_code: false
-            files: [
-              expand: true
-              cwd: '<%= bower.options.targetDir %>'
-              src: [
-                '{,*/,*/*/}*.js',
-                '!{,*/,*/*/}*{.min,-min}.js', '!debug/{,*/}*.js'
-              ]
-              dest: '<%= bower.options.targetDir %>'
-            ]
+      options:
+        preserveComments: require 'uglify-save-license'
+      main:
+        options:
+          banner: "/*! Copyright (c) 2013 -2014 Shinnosuke Watanabe | MIT License */\n"
+          compress:
+            global_defs:
+              DEBUG: false
+            dead_code: true
+        src: '<%= coffee.dist.dest %>'
+        dest: '<%= uglify.main.src %>'
+      bower:
+        options:
+          compress:
+            # For /*cc_on!*/ comments
+            dead_code: false
+        files: [
+          expand: true
+          cwd: '<%= bower.options.targetDir %>'
+          src: [
+            '{,*/,*/*/}*.js',
+            '!{,*/,*/*/}*{.min,-min}.js', '!debug/{,*/}*.js'
+          ]
+          dest: '<%= bower.options.targetDir %>'
+        ]
     
     compass:
       dist:
@@ -254,7 +254,7 @@ module.exports = (grunt) ->
           user:
             name: 'shinnn'
         src: '**/*'
-      
+    
   grunt.registerTask 'default', [
     'analysis'
     'compass'

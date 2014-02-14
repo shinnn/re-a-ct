@@ -93,19 +93,19 @@ module.exports = (grunt) ->
       ffmpeg:
         # -y: Overwrite output files.
         command: [
-            # M4A
-            "afconvert #{ rawAudioCwd }<%= ffmpegPath %>.wav
-              -d aac -f m4af -u pgcm 2 -b 256000 -q 127 -s 2
-              #{ DEST }audio/compressed/m4a/<%= ffmpegPath %>.m4a"
-            # WebM
-            "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
-              -vn -codec:a libvorbis -aq 1M
-              #{ DEST }audio/compressed/webm/<%= ffmpegPath %>.webm"
-            # Ogg
-            "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
-              -vn -codec:a libvorbis -qscale:a 10
-              #{ DEST }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
-          ].join '&&'
+          # M4A
+          "afconvert #{ rawAudioCwd }<%= ffmpegPath %>.wav
+            -d aac -f m4af -u pgcm 2 -b 256000 -q 127 -s 2
+            #{ DEST }audio/compressed/m4a/<%= ffmpegPath %>.m4a"
+          # WebM
+          "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
+            -vn -codec:a libvorbis -aq 1M
+            #{ DEST }audio/compressed/webm/<%= ffmpegPath %>.webm"
+          # Ogg
+          "ffmpeg -y -i #{ rawAudioCwd }<%= ffmpegPath %>.wav
+            -vn -codec:a libvorbis -qscale:a 10
+            #{ DEST }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
+        ].join '&&'
         options:
           callback: (err, stdout, stderr, cb) ->
             console.warn stderr if stderr

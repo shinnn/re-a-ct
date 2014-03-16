@@ -285,7 +285,7 @@ module.exports = (grunt) ->
           message: 'auto commit by grunt-gh-pages'
           user:
             name: 'shinnn'
-        src: '**/*'
+        src: ['**/*', '.nojekyll']
   
   grunt.registerTask 'default', [
     'bower'

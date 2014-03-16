@@ -9,9 +9,33 @@
   "private": true,
   "dependencies": {
     "jquery": "latest",
+    "jquery.transit": "latest",
     "mousetrap": "latest",
     "jquery-ui-touch-punch": "latest",
     "screenfull": "latest",
     "audiocontext-polyfill": "latest"
+  },
+  "devDependencies": {
+    "benchmark": "latest"
+  },
+  "exportsOverride": {
+    "/jquery\\d?$/": {
+      "public": "jquery.min.js"
+    },
+    "jquery.transit": {
+      "jquery.transit": "jquery.transit.js"
+    },
+    "mousetrap": {
+      "mousetrap": "mousetrap.min.js"
+    },
+    "jquery-ui-touch-punch": {
+      "jquery-ui-touch-punch": "jquery.ui.touch-punch.js"
+    },
+    "screenfull": {
+      "screenfull": "dist/screenfull.min.js"
+    },
+    "benchmark": {
+      "debug": "./benchmark.js"
+    }
   }
 }

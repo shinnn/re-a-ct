@@ -530,7 +530,7 @@ function schedule(){
         
         // アニメーション
         if(Math.round(Math.random() + 0.3) === 1){
-          obj.animate(
+          obj.transition(
             {
               left: '+=' + varX,
               top: '+=' + varY,
@@ -621,12 +621,12 @@ function createAnima(duration){
 $.fn.animaMove = function(x, y, duration){
   var obj = $(this);
   //var animaTimer;
-  obj.animate({left: '+='+x, top: '+='+y, opacity: '1'}, interval, function(){
+  obj.transition({left: '+='+x, top: '+='+y, opacity: '1'}, interval, function(){
     //playPiano2();
-    obj.animate({left: '-=100', top: '+=100'}, interval, function(){
+    obj.transit({left: '-=100', top: '+=100'}, interval, function(){
       //playPiano2();
-      obj.animate({left: '+=100', top: '+=100'}, interval);
-      this.classList.add('released');
+      obj.transit({left: '+=100', top: '+=100'}, interval);
+      obj.addClass('released');
     });
   });
 };
@@ -758,7 +758,7 @@ $(function(){
         .css({
           'left': value
         })
-        .text(ui.value);  //Adjust the tooltip accordingly
+        .text(ui.value);
         */
         
         var volumeStyle = document.getElementsByClassName('icon_volume')[index].style;

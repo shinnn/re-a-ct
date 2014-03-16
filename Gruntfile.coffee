@@ -62,9 +62,9 @@ module.exports = (grunt) ->
     opt = { cwd: 'audio/raw/' }
     tracks = grunt.file.expand opt, '**/*.wav'
     for track in tracks
-      grunt.task.run 'ffmpeg:' + track
+      grunt.task.run '_ffmpeg:' + track
 
-  grunt.registerTask 'ffmpeg', (path) ->
+  grunt.registerTask '_ffmpeg', (path) ->
     cfg 'ffmpegPath', path.replace '.wav', ''
     console.log "Encoding #{ cfg('ffmpegPath') }.wav..."
     grunt.task.run 'shell:ffmpeg'
@@ -118,6 +118,15 @@ module.exports = (grunt) ->
         options:
           stdout: true
     
+    bower:
+      options:
+        targetDir: "#{ DEST }.tmp/bower_exports/"
+        cleanTargetDir: true
+      install:
+        options:
+          bowerOptions:
+            production: true
+    
     lodash:
       options:
         modifier: 'legacy'
@@ -154,15 +163,22 @@ module.exports = (grunt) ->
           dest: DEST
           dot: true
         ]
-    
-    bower:
-      options:
-        targetDir: "#{ DEST }.tmp/bower_exports/"
-        cleanTargetDir: true
-      install:
-        options:
-          bowerOptions:
-            production: true
+      bower:
+        files: [
+          expand: true
+          cwd: '<%= bower.options.targetDir %>/public'
+          src: ['**', '!**/{.DS_Store,Thumbs.db}']
+          dest: "#{ DEST }bower_components"
+          dot: true
+        ]
+      bower_debug:
+        files: [
+          expand: true
+          cwd: '<%= bower.options.targetDir %>/debug'
+          src: ['**', '!**/{.DS_Store,Thumbs.db}']
+          dest: "#{ DEST }/debug/bower_components"
+          dot: true
+        ]
     
     uglify:
       options:
@@ -192,26 +208,38 @@ module.exports = (grunt) ->
         ]
     
     compass:
+      options:
+        sassDir: 'scss'
+        cssDir: "#{ DEST }css"
+        environment: 'development'
+        outputStyle: 'expand'
+      dist: {}
+    
+    autoprefixer:
       dist:
-        options:
-          sassDir: 'scss'
-          cssDir: "#{ DEST }css"
-          environment: 'production'
-          outputStyle: 'compressed'
-      dev:
-        options:
-          sassDir: 'scss'
-          cssDir: "#{ DEST }css"
-          environment: 'development'
-          outputStyle: 'expand'
-      
+        src: '<%= compass.options.cssDir%>{,*/}*.css'
+    
+    cssmin:
+      options:
+        report: 'min'
+      dist:
+        files: [
+          expand: true
+          cwd: '<%= compass.options.cssDir%>'
+          src: ['{,*/}*.css']
+          dest: "#{ DEST }css/"
+        ]
+    
     concat:
       main:
-        src: ['js/app/*.js']
+        src: ['js/main/*.js']
         dest: "#{ DEST }js/re-a-ct.js"
-        
       vendor:
-        src: ['js/vendor/*.js']
+        src: [
+          "js/vendor/{,*/}*.js"
+          '<%= bower.options.targetDir %>{,*/,*/*/}*.js'
+          '!<%= bower.options.targetDir %>{public,ie,debug}{,*/,*/*/}*.js'
+        ]
         dest: "#{ DEST }js/vendor.js"
     
     jade:
@@ -220,16 +248,20 @@ module.exports = (grunt) ->
         dest: "#{ DEST }index.html"
     
     connect:
-      server:
+      options:
+        livereload: 35729
+        port: 8000
+      site:
         options:
           base: DEST
 
     watch:
       options:
-        livereload: true
+        livereload: '<%= connect.options.livereload %>'
+
       compass:
         files: ['scss/*.scss']
-        tasks: ['compass']
+        tasks: ['compass', 'autoprefixer', 'cssmin']
       js_main:
         files: ['js/main/*.js']
         tasks: ['concat:main']
@@ -254,10 +286,12 @@ module.exports = (grunt) ->
           user:
             name: 'shinnn'
         src: '**/*'
-    
+  
   grunt.registerTask 'default', [
+    'bower'
     'analysis'
-    'compass'
+    'encode'
+    'compass', 'autoprefixer', 'cssmin'
     'concat', 'shell:coffeelint'
     'jade'
     'copy:public'

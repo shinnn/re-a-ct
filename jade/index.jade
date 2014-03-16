@@ -15,7 +15,6 @@ html(lang='ja')
 
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     meta(name='format-detection', content='telephone=no')
-    link(href='css/normalize.css', rel='stylesheet', media=' all')
     link(href='css/styles.css', rel='stylesheet', media='screen')
   body
     include google-analytics
@@ -57,7 +56,7 @@ html(lang='ja')
       #shortcut
     
     mixin loadJQuery(version)
-      script(src='https://ajax.googleapis.com/ajax/libs/jquery/#{version}/jquery.min.js')
+      script(src='//ajax.googleapis.com/ajax/libs/jquery/#{version}/jquery.min.js')
 
       - var jQueryFallbacks = [];
       - jQueryFallbacks[0] = 'http://code.jquery.com/jquery-' + version + '.min.js';
@@ -69,7 +68,7 @@ html(lang='ja')
         script.
           window.jQuery || document.write('<script src=#{url}><\/script>');
     
-    mixin loadJQuery('2.0.3')
+    mixin loadJQuery('2.1.0')
     
     script(src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js')
     script(src='js/vendor.js')

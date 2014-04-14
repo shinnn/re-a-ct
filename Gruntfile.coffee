@@ -185,7 +185,7 @@ module.exports = (grunt) ->
         preserveComments: require 'uglify-save-license'
       main:
         options:
-          banner: "/*! Copyright (c) 2013 -2014 Shinnosuke Watanabe | MIT License */\n"
+          banner: "/*! (c) 2013 - 2014 Shinnosuke Watanabe | MIT License */\n"
           compress:
             global_defs:
               DEBUG: false
@@ -281,7 +281,6 @@ module.exports = (grunt) ->
       site:
         options:
           base: DEST
-          branch: 'gh-pages'
           message: 'auto commit by grunt-gh-pages'
           user:
             name: 'shinnn'

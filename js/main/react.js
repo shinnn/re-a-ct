@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2012-2013 Shinnosuke Watanabe
- * github.com/shinnn
-*/
-
 var ctx = new AudioContext();
 
 window.Dominant = function(audioContext){

@@ -106,17 +106,10 @@ module.exports = (grunt) ->
             -vn -codec:a libvorbis -qscale:a 10
             #{ DEST }audio/compressed/ogg/<%= ffmpegPath %>.ogg"
         ].join '&&'
-        options:
-          callback: (err, stdout, stderr, cb) ->
-            console.warn stderr if stderr
-            console.log stdout if stdout
-            cb()
       
       coffeelint:
         command:
           "#{ BIN }coffeelint Gruntfile.coffee"
-        options:
-          stdout: true
     
     bower:
       options:

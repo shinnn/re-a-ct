@@ -4,28 +4,28 @@ window.Dominant = function(audioContext){
   //tmp
 };
 
-Dominant.createPlaylist = function(){
+Dominant.createPlaylist = function() {
   var Playlist = {};
   Playlist.tracks = [];
   Playlist.currentTrack = null;
   Playlist.currentTime = 0;
   
-  this.play = function(){
-    if(!!Playlist.currentTrack){
-      Playlist.currentTrack.play();      
-    }else{
-      if(Playlist.tracks.length > 0){
+  this.play = function() {
+    if (!!Playlist.currentTrack) {
+      Playlist.currentTrack.play();
+    } else {
+      if(Playlist.tracks.length > 0) {
         Playlist.tracks[0].play();
         Playlist.currentTrack  = Playlist.tracks[0];
       }
     }
   };
   
-  Playlist.nextTrack = function(){
+  Playlist.nextTrack = function() {
     //tmp
   };
   
-  Playlist.prevTrack = function(){
+  Playlist.prevTrack = function() {
     //tmp
   };
   
@@ -35,7 +35,7 @@ Dominant.createPlaylist = function(){
   return Playlist;
 };
 
-Dominant.loadPlaylist = function(){
+Dominant.loadPlaylist = function() {
   var json;
 };
 
@@ -60,7 +60,7 @@ var initX = 0, initY = 0;
 var seVolume = 1;
 
 //id = 'container' のDIV。 要素の挿入でしばしば使うためキャッシュしておく
-var parent;
+var parentElm;
 
 var maxLevel = 10;
 var colorOfLevel = [
@@ -106,36 +106,36 @@ $(function(){
   panner.panningModel = 0;
   panner.distanceModel = 0;
   
-  parent = document.getElementById('container');
+  parentElm = document.getElementById('container');
   
   function playTypeLevel(type, codec){
     var str = document.createElement('audio').canPlayType(
       'audio/' + type + (codec? '; codecs=' + codec: '')
     );
     
-    if(str === 'probably'){ return 2; }
-    if(str === 'maybe'){ return 1; }
+    if(str === 'probably') { return 2; }
+    if(str === 'maybe') { return 1; }
     return 0;
   }
   
   var fileFormat, fileBitRate;
 	
-  if(isMobile){
-    if(playTypeLevel('mp4', 'mp4a.40.5') > 0){
+  if (isMobile) {
+    if (playTypeLevel('mp4', 'mp4a.40.5') > 0) {
       fileFormat = 'm4a';
     }
   
-  }else if(false && location.hostname === 'localhost'){
+  } else if (location.hostname === 'localhost') {
     fileFormat = 'wav';
 
-  }else{
-    if(playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('webm', 'vorbis')){
+  } else {
+    if (playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('webm', 'vorbis')) {
       fileFormat = 'm4a';
 
-    }else if(playTypeLevel('webm', 'vorbis') >= playTypeLevel('ogg', 'vorbis')){
+    } else if (playTypeLevel('webm', 'vorbis') >= playTypeLevel('ogg', 'vorbis')) {
         fileFormat = 'webm';
       
-    }else{
+    } else {
       fileFormat = 'ogg';
     }
   }
@@ -143,21 +143,21 @@ $(function(){
   console.log(fileFormat + ' mode');
   
   var audioPath = [
-    "beat",
-    "piano",
-    "piano2",
-    "pad",
-    "beat0",
-    "beat1",
-    "beat2",
-    "beat3",
-    "beat4",
-    "beat5",
-    "beat6",
-    "beat7",
-    "beat8",
-    "beat9",
-    "beat10"
+    'beat',
+    'piano',
+    'piano2',
+    'pad',
+    'beat0',
+    'beat1',
+    'beat2',
+    'beat3',
+    'beat4',
+    'beat5',
+    'beat6',
+    'beat7',
+    'beat8',
+    'beat9',
+    'beat10'
   ];
     
   var preffix = src.cwd + src.format[fileFormat];
@@ -166,7 +166,7 @@ $(function(){
   var path;
   $.getJSON(
     'audio/data-json/playlist.json',
-    function(data){
+    function (data) {
       var path = src.cwd +
                  src.tracks.replace('{format}', src.format[fileFormat]) +
                  data.tracks[0].fileName + '.' + fileFormat;
@@ -187,30 +187,30 @@ $(function(){
   */
     
   var pointingEvent;
-  if(parent.ontouchstart !== undefined){
+  if (parentElm.ontouchstart !== undefined) {
     pointingEvent = 'touchstart';
-  }else if(parent.onmousedown !== undefined){
+  } else if (parentElm.onmousedown !== undefined) {
     pointingEvent = 'mousedown';
-  }else{
+  } else {
     pointingEvent = 'click';
   }
-    
+  
   //Load Audio Files
   bufferLoader = new BufferLoader(
     ctx, preffix + 'effects/', audioPath, fileFormat, bufferLoaderCallback
   );
   bufferLoader.load();
   
-  function bufferLoaderCallback(){
-    console.log("finish load.");
+  function bufferLoaderCallback() {
+    console.log('finish load.');
     
     //click にバインドするより操作性が高い
-    $(parent).on(pointingEvent, null, function(e){
+    $(parentElm).on(pointingEvent, null, function(e) {
       if(e.button !== undefined && e.button !== 0){
         return;
       }
   
-      if(timeoutId === false){
+      if (timeoutId === false) {
         bgloop.play();
         startTime = ctx.currentTime - noteTime;
         schedule();
@@ -224,15 +224,15 @@ $(function(){
     //SPACE key binding
     Mousetrap.bind('space', pauseBGloop);
     
-    function pauseBGloop(keyboardEvent){
-      if(keyboardEvent && keyboardEvent.preventDefault){
+    function pauseBGloop(keyboardEvent) {
+      if (keyboardEvent && keyboardEvent.preventDefault) {
         keyboardEvent.preventDefault();
       }
-      if(timeoutId === false){
+      if (timeoutId === false) {
         bgloop.play();
         startTime = ctx.currentTime - noteTime;
         schedule();
-      }else{
+      } else {
         bgloop.pause();
         clearTimeout(timeoutId);
         timeoutId = false;
@@ -241,19 +241,18 @@ $(function(){
     
     // タブがアクティブで無くなった場合、一時停止する
     // https://developers.google.com/chrome/whitepapers/pagevisibility
-    document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
-    function handleVisibilityChange(){
-      if(document.webkitHidden){
+    document.addEventListener('webkitvisibilitychange', handleVisibilityChange, false);
+    function handleVisibilityChange() {
+      if (document.webkitHidden) {
         bgloop.pause();
         clearTimeout(timeoutId);
         timeoutId = false;
-      }else{
+      } else {
         bgloop.play();
         startTime = ctx.currentTime - noteTime;
         schedule();
       }
     }
-    
   }
   
   //m key binding
@@ -263,14 +262,14 @@ $(function(){
   ss.rel = 'stylesheet';
   ss.media = 'screen';
 
-  function toggleRectStyle(){
+  function toggleRectStyle() {
     var head = document.getElementsByTagName('head')[0];
     var sheets = head.getElementsByTagName('link');
   
-    if(sheets[sheets.length-1] === ss){
+    if (sheets[sheets.length-1] === ss) {
       head.removeChild(ss);
       console.log('remove style');
-    }else{
+    } else {
       // http://www.softel.co.jp/blogs/tech/archives/994
       head.insertBefore(ss, head.getElementsByTagName('script')[0]);
       console.log('append style');
@@ -282,84 +281,84 @@ $(function(){
   Mousetrap.trigger('M');
 });
 
-function playBass(timing){
-  console.log("bass " + timing);
+function playBass(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[0], ctx.destination, timing);
 }
 
-function playBass0(timing){
-  console.log("bass " + timing);
+function playBass0(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[4], ctx.destination, timing);
 }
 
-function playBass1(timing){
-  console.log("bass " + timing);
+function playBass1(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[5], ctx.destination, timing);
 }
 
-function playBass2(timing){
-  console.log("bass " + timing);
+function playBass2(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[6], ctx.destination, timing);
 }
 
-function playBass3(timing){
-  console.log("bass " + timing);
+function playBass3(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[7], ctx.destination, timing);
 }
 
-function playBass4(timing){
-  console.log("bass " + timing);
+function playBass4(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[8], ctx.destination, timing);
 }
 
-function playBass5(timing){
-  console.log("bass " + timing);
+function playBass5(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[9], ctx.destination, timing);
 }
 
-function playBass6(timing){
-  console.log("bass " + timing);
+function playBass6(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[10], ctx.destination, timing);
 }
 
-function playBass7(timing){
-  console.log("bass " + timing);
+function playBass7(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[11], ctx.destination, timing);
 }
 
-function playBass8(timing){
-  console.log("bass " + timing);
+function playBass8(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[12], ctx.destination, timing);
 }
 
-function playBass9(timing){
-  console.log("bass " + timing);
+function playBass9(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[13], ctx.destination, timing);
 }
 
-function playBass10(timing){
-  console.log("bass " + timing);
+function playBass10(timing) {
+  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[14], ctx.destination, timing);
 }
 
-function playPiano(panX){
+function playPiano(panX) {
   var src = playSound(bufferLoader.bufferList[1], panner, 0);
   createAnima(src.buffer.duration, animaX, animaY);
 }
 
-function playPiano2(timing){
+function playPiano2(timing) {
   //source[2]playSound(bufferLoader.bufferList[2], panner, timing);
   //source[2].buffer.gain = 0.5;
   //source[2].buffer.gain = 0;
 }
 
-function playPad(panX){
+function playPad(panX) {
   //  panner.setPosition(panX,2,2);
   //source[3] = playSound(bufferLoader.bufferList[3], ctx.destination, 0);
   //source[3].buffer.gain = 0.02;
 }
 
-function playSound(buffer, dest, timing){
+function playSound(buffer, dest, timing) {
   var src = ctx.createBufferSource();
   src.buffer = buffer;
   src.buffer.gain = seVolume;
@@ -374,7 +373,7 @@ var time = 0;
 var beatMap;
 $.getJSON(
   'audio/data-json/_analysis.json',
-  function(data){
+  function(data) {
     var json = data.tracks['main/background'];
 
     beatMap = json.beat_times;    
@@ -389,24 +388,24 @@ var frog, released, varXY, hit, hitObj;
 
 
 //メインループ
-function schedule(){
+function schedule() {
   var currentTime = ctx.currentTime - startTime;
-  if(bgloop.restart && bgloop.ended){
-    if(document.getElementsByClassName('released').length > 0){
-      console.log("restart");
+  if (bgloop.restart && bgloop.ended) {
+    if (document.getElementsByClassName('released').length > 0) {
+      console.log('restart');
       bgloop.play();
 
-    }else{
+    } else {
       //welcome or click here
     }
   }
   
-  while(noteTime <= currentTime){
-    noteTime += interval*0.001 * 0.1;
+  while (noteTime <= currentTime) {
+    noteTime += interval * 0.001 * 0.1;
     drawSpectrum();
 
-    if(time%5 === 0){      
-      if(createStart === true){
+    if (time%5 === 0) {
+      if (createStart === true) {
         panner.setPosition((animaX - window.innerWidth * 0.5) * 0.01, 0, 10);
         playPiano();
         createStart = false;
@@ -434,14 +433,15 @@ function schedule(){
       //each method start
       for(i=0, len = released.length; i < len; i++){
         var current = i + Math.round(Math.random());
-        elm = released[i], obj = $(elm);
+        elm = released[i];
+        obj = $(elm);
         level = elm.dataset.level;
 
         varX = Math.floor((Math.random() - 0.5) * movementRange);
         varY = Math.floor((Math.random() - 0.5) * movementRange);
         varXY = (Math.abs(varX) + Math.abs(varY)) * 1.5 + 100;
         
-        if(level == 10){
+        if(level === 10){
           varX = varX * 1.5 + 50;
           varY = varY * 1.5 + 50;
         }
@@ -455,10 +455,10 @@ function schedule(){
         // 生存判定
         var opc = parseFloat(elm.style.opacity);
         if(opc <= 0.05){
-          parent.removeChild(elm); //$.fn.remove よりも高速
+          parentElm.removeChild(elm); //$.fn.remove よりも高速
           len--;
           i--;
-          console.log("died..." + len);
+          console.log('died...' + len);
         }
         
         //TODO: jQuery Collision は重いので別のを
@@ -466,7 +466,7 @@ function schedule(){
                 
         hitObj = obj.collision(frog).not(elm);
         if(hitObj.length > 0){
-          if(level != 10){
+          if(level !== 10){
             if(level === undefined){
               elm.dataset.level = 0;
             }else{
@@ -538,7 +538,7 @@ function schedule(){
                 
         //playPad(/* (off.left-$(document).width()*0.5)*0.01 + 5 */);
       }
-      $(".ripple:gt(" + (len*2 <= 15? len*2: 15) + ")").remove();
+      $('.ripple:gt(' + (len*2 <= 15? len*2: 15) + ')').remove();
     }
 
     if(time%20 === 0){
@@ -580,7 +580,7 @@ var restartAnimation = (function(){
 
     rippleStyle.borderColor = colorOfLevel[elm.dataset.level];
 
-    parent.insertBefore(ripple, parent.childNodes[0]);
+    parentElm.insertBefore(ripple, parentElm.childNodes[0]);
   };
   
   return function(){
@@ -610,7 +610,7 @@ function createAnima(duration){
   }
   
   $(frog).animaMove(animaX - initX, animaY - initY, duration * 1000);
-  parent.insertBefore(frog, parent.childNodes[0]);
+  parentElm.insertBefore(frog, parentElm.childNodes[0]);
 }
 
 $.fn.animaMove = function(x, y, duration){
@@ -678,7 +678,7 @@ $(function(){
     $(footer).animate({'bottom': 0}, 500);
     
     //カーソルの変更
-    parent.style.cursor = 'url(img/cursor.png), crosshair';
+    parentElm.style.cursor = 'url(img/cursor.png), crosshair';
   }, false);
   
   controlPause.addEventListener('click', function(){
@@ -721,15 +721,15 @@ $(function(){
   tooltip.hide();
 
 
-  slider[0].volumeChange = function(intVal){
+  slider[0].volumeChange = function(intVal) {
     bgloop.volume = intVal * 0.01; // BGMの音量の設定(0.0 〜 1.0)
   };
-  slider[1].volumeChange = function(intVal){
+  slider[1].volumeChange = function(intVal) {
     seVolume = intVal * 0.01; // BGMの音量の設定(0.0 〜 1.0)
   };
   
   //Call the Slider
-  slider.each(function(index){
+  slider.each(function(index) {
     var maxValue = 100;
         
     $(this).slider({
@@ -758,21 +758,18 @@ $(function(){
         
         var volumeStyle = document.getElementsByClassName('icon_volume')[index].style;
 
-        if(sliderValues[index] <= maxValue * 0.05) {
+        if (sliderValues[index] <= maxValue * 0.05) {
           volumeStyle.backgroundPositionY = '0';
-        }
-        else if (sliderValues[index] <= maxValue * 0.25) {
+        } else if (sliderValues[index] <= maxValue * 0.25) {
           volumeStyle.backgroundPositionY = '-25px';
-        }
-        else if (sliderValues[index] <= maxValue * 0.75) {
+        } else if (sliderValues[index] <= maxValue * 0.75) {
           volumeStyle.backgroundPositionY = '-50px';
-        }
-        else {
+        } else {
           volumeStyle.backgroundPositionY = '-75px';
         }
       },
 
-      stop: function(event, ui){
+      stop: function(event, ui) {
         this.volumeChange($(this).slider('value')); //音量設定
         //tooltip.fadeOut('fast');
       }
@@ -784,14 +781,14 @@ $(function(){
 
   var playbackTimeoutID = null;
 
-  function finishSlide(){
-    if(playbackTimeoutID !== null){
+  function finishSlide() {
+    if (playbackTimeoutID !== null) {
       clearTimeout(playbackTimeoutID);
     }
-    playbackTimeoutID = setTimeout(function(){ updateTime(); }, 40);
+    playbackTimeoutID = setTimeout(function() { updateTime(); }, 40);
   }
   
-  function updateTime(){
+  function updateTime() {
     bgloop.currentTime = timeSlider.slider('value') / timeSliderMax * bgloop.duration;
   }
   
@@ -806,12 +803,13 @@ $(function(){
       //tooltip.fadeIn('fast');
     },
     
-    slide: function(event, ui){ //When the slider is sliding
+    //When the slider is sliding
+    slide: function(event, ui) {
       bgloop.removeEventListener('timeupdate', bgTimeUpdate, false);
       finishSlide();
     },
     
-    stop: function(){
+    stop: function() {
       bgloop.addEventListener('timeupdate', bgTimeUpdate, false);
     }
   });
@@ -821,48 +819,53 @@ $(function(){
   var durationMMSS;
   
   // Get Duration
-  bgloop.addEventListener('loadeddata', function(){
+  bgloop.addEventListener('loadeddata', function() {
     var remainingMMSS = toHHMMSS(Math.floor(bgloop.duration - bgloop.currentTime), 1);
     counterNodes[1].innerText = remainingMMSS;
   }, false);
 
   bgloop.addEventListener('timeupdate', bgTimeUpdate, false);
 
-  function bgTimeUpdate(){
-    timeSlider.slider('value', (bgloop.currentTime / bgloop.duration) * timeSliderMax);
+  function bgTimeUpdate() {
+    timeSlider.slider(
+      'value',
+      bgloop.currentTime / bgloop.duration * timeSliderMax
+    );
     
     var currentMMSS = toHHMMSS(Math.floor(bgloop.currentTime), 1);
-    if(counterNodes[0].innerText !== currentMMSS){
+    if (counterNodes[0].innerText !== currentMMSS) {
       counterNodes[0].innerText = currentMMSS;
       
-      if(typeof bgloop.duration === 'number'){
-        var remainingMMSS = toHHMMSS(Math.floor(bgloop.duration - bgloop.currentTime), 1);
+      if (typeof bgloop.duration === 'number') {
+        var remainingMMSS = toHHMMSS(
+          Math.floor(bgloop.duration - bgloop.currentTime),
+          1
+        );
         counterNodes[1].innerText = '- ' + remainingMMSS;
       }
     }
   }
   
-  // http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-with-format-hhmmss
-  function toHHMMSS(sec, divisionNumber){
+  // http://stackoverflow.com/questions/6312993/
+  function toHHMMSS(sec, divisionNumber) {
     var sec_numb    = parseInt(sec, 10);
     var hours   = Math.floor(sec_numb / 3600);
     var minutes = Math.floor((sec_numb - (hours * 3600)) / 60);
     var seconds = sec_numb - (hours * 3600) - (minutes * 60);
     
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
+    if (hours   < 10) {hours   = '0'+hours;}
+    if (minutes < 10) {minutes = '0'+minutes;}
+    if (seconds < 10) {seconds = '0'+seconds;}
 
     var resultString = '';
-    if(divisionNumber === 2){
+    if (divisionNumber === 2) {
       resultString = hours+':'+minutes+':'+seconds;
-    }else if(divisionNumber === 1){
+    } else if(divisionNumber === 1) {
       resultString = minutes+':'+seconds;
-    }else{
+    } else {
       resultString = seconds;
     }
     
     return resultString;
   }
 });
-

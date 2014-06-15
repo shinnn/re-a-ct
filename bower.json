@@ -19,8 +19,8 @@
     "benchmark": "latest"
   },
   "exportsOverride": {
-    "/jquery\\d?$/": {
-      "public": "jquery.min.js"
+    "jquery": {
+      "public": "dist/jquery.min.js"
     },
     "jquery.transit": {
       "jquery.transit": "jquery.transit.js"

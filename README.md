@@ -1,10 +1,11 @@
 # `<div>o　o</div>` <Hello!
 
-# [re(a)ct - Sound Interaction Expreriment with HTML5 Web Audio API](http://shinnn.github.io/re-a-ct/)
+# [re(a)ct](http://shinnn.github.io/re-a-ct/)
 
-[![devDependency Status](https://david-dm.org/shinnn/re-a-ct/dev-status.png)](https://david-dm.org/shinnn/re-a-ct#info=devDependencies)
+A sound interaction expreriment with HTML5 Web Audio API
+
+[![devDependency Status](https://david-dm.org/shinnn/re-a-ct/dev-status.svg)](https://david-dm.org/shinnn/re-a-ct#info=devDependencies)
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/shinnn/re-a-ct/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 キャラクターとともに生成される音を楽しむWebアプリケーションです。
 
@@ -18,3 +19,8 @@ Google ChromeとSafariを推奨しています。最新版のChromeは[こちら
 * **クリックするごとに、クリックした位置にキャラクターが登場します。**キャラクターはBGMのリズムに合わせて動き回ります。
 * **キャラクター同士がぶつかるとき、音が鳴ります**。ぶつからない間は色が次第に薄くなってゆき、そのうち消えて行きます。
 * **キャラクターはぶつかった際に成長**し、大きさと色が変わります。成長段階に応じて、ぶつかったときに鳴る音も変化します。
+
+## License
+
+Copyright (c) 2013 - 2014 [Shinnosuke Watanabe](https://github.com/shinnn).
+Licensed under [the MIT license](./LICENSE).

@@ -1,0 +1,8 @@
+{
+  "eqeqeq": true,
+  "indent": 2,
+  "quotmark": "single",
+  "browser": true,
+  "node": false,
+  "esnext": true
+}

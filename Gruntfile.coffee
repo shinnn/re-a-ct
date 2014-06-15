@@ -173,6 +173,11 @@ module.exports = (grunt) ->
           dot: true
         ]
     
+    jshint:
+      options:
+        jshintrc: '.jshintrc'
+      all: ['js/main/*.js']
+    
     uglify:
       options:
         preserveComments: require 'uglify-save-license'
@@ -257,7 +262,7 @@ module.exports = (grunt) ->
         tasks: ['compass', 'autoprefixer', 'cssmin']
       js_main:
         files: ['js/main/*.js']
-        tasks: ['concat:main']
+        tasks: ['jshint', 'concat:main']
       js_vendor:
         files: ['js/vendor/*.js']
         tasks: ['concat:vendor']
@@ -280,6 +285,7 @@ module.exports = (grunt) ->
         src: ['**/*', '.nojekyll']
   
   grunt.registerTask 'default', [
+    'jshint'
     'bower'
     'analysis'
     'encode'

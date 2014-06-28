@@ -13,7 +13,8 @@
     "mousetrap": "latest",
     "jquery-ui-touch-punch": "latest",
     "screenfull": "latest",
-    "audiocontext-polyfill": "latest"
+    "audiocontext-polyfill": "latest",
+    "isMobile": "latest"
   },
   "devDependencies": {
     "benchmark": "latest"
@@ -33,6 +34,9 @@
     },
     "screenfull": {
       "screenfull": "dist/screenfull.min.js"
+    },
+    "isMobile": {
+      "isMobile": "isMobile.js"
     },
     "benchmark": {
       "debug": "./benchmark.js"

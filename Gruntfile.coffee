@@ -87,7 +87,7 @@ module.exports = (grunt) ->
     shell:
       aubiotrack:
         command: "aubiotrack -i
-                   #{ rawAudioCwd }tracks/<%= trackPath %>.wav -O complexdomain"
+                  #{ rawAudioCwd }tracks/<%= trackPath %>.wav"
         options:
           callback: _aubiotrackCallback
       ffmpeg:
@@ -111,6 +111,9 @@ module.exports = (grunt) ->
         command:
           "#{ BIN }coffeelint Gruntfile.coffee"
     
+    clean:
+      site: DEST
+      
     bower:
       options:
         targetDir: "#{ DEST }.tmp/bower_exports/"
@@ -273,7 +276,7 @@ module.exports = (grunt) ->
         files: ['jade/**/*.jade']
         tasks: ['jade']
       html:
-        files: ["#{ DEST }*.html"]
+        files: ["#{ DEST }index.html"]
     
     'gh-pages':
       site:
@@ -284,7 +287,8 @@ module.exports = (grunt) ->
             name: 'shinnn'
         src: ['**/*', '.nojekyll']
   
-  grunt.registerTask 'default', [
+  grunt.registerTask 'build', [
+    'clean'
     'jshint'
     'bower'
     'analysis'
@@ -295,3 +299,7 @@ module.exports = (grunt) ->
     'copy:public'
     'connect', 'watch'
   ]
+
+  grunt.registerTask 'default', ['build', 'connect', 'watch']
+
+  grunt.registerTask 'deploy', ['build', 'gh-pages']

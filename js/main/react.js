@@ -54,7 +54,6 @@ var bgloop = new Audio();
 var playlist = [bgloop];
 
 var animaX = 0, animaY = 0;
-var initX = 0, initY = 0;
 
 //効果音の音量
 var seVolume = 1;
@@ -76,9 +75,6 @@ var colorOfLevel = [
   '#EBD300',
   '#FFFFFF'
 ];
-
-var isMobile = (navigator.userAgent.indexOf('like Mac OS X') !== -1 ||
-navigator.userAgent.indexOf('Android') !== -1);
 
 var src;
 
@@ -120,7 +116,7 @@ $(function(){
   
   var fileFormat, fileBitRate;
 	
-  if (isMobile) {
+  if (isMobile.any) {
     if (playTypeLevel('mp4', 'mp4a.40.5') > 0) {
       fileFormat = 'm4a';
     }
@@ -268,11 +264,9 @@ $(function(){
   
     if (sheets[sheets.length-1] === ss) {
       head.removeChild(ss);
-      console.log('remove style');
     } else {
       // http://www.softel.co.jp/blogs/tech/archives/994
       head.insertBefore(ss, head.getElementsByTagName('script')[0]);
-      console.log('append style');
     }
     //document.getElementsByTagName('head')[0].appendChild(ss);
   }
@@ -282,62 +276,50 @@ $(function(){
 });
 
 function playBass(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[0], ctx.destination, timing);
 }
 
 function playBass0(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[4], ctx.destination, timing);
 }
 
 function playBass1(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[5], ctx.destination, timing);
 }
 
 function playBass2(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[6], ctx.destination, timing);
 }
 
 function playBass3(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[7], ctx.destination, timing);
 }
 
 function playBass4(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[8], ctx.destination, timing);
 }
 
 function playBass5(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[9], ctx.destination, timing);
 }
 
 function playBass6(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[10], ctx.destination, timing);
 }
 
 function playBass7(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[11], ctx.destination, timing);
 }
 
 function playBass8(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[12], ctx.destination, timing);
 }
 
 function playBass9(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[13], ctx.destination, timing);
 }
 
 function playBass10(timing) {
-  console.log('bass ' + timing);
   playSound(bufferLoader.bufferList[14], ctx.destination, timing);
 }
 
@@ -418,7 +400,6 @@ function schedule() {
         if(beatMap[i] > currentTime){
           interval = (beatMap[i] - beatMap[i-1]) * 1000;
           hitInterval = interval * 0.001 * 1/12 * 6;
-          console.log('int', interval);
           break;
         }
       }
@@ -458,23 +439,20 @@ function schedule() {
           parentElm.removeChild(elm); //$.fn.remove よりも高速
           len--;
           i--;
-          console.log('died...' + len);
         }
         
         //TODO: jQuery Collision は重いので別のを
         //追記: 重さは別の原因がある？
                 
         hitObj = obj.collision(frog).not(elm);
-        if(hitObj.length > 0){
-          if(level !== 10){
-            if(level === undefined){
+        if (hitObj.length > 0) {
+          if (level !== 10) {
+            if (level === undefined) {
               elm.dataset.level = 0;
-            }else{
+            } else {
               elm.dataset.level++;
               level = Number(elm.dataset.level);
             }
-          }else{
-            console.log('final level');
           }
           
           elm.style.opacity = opc + 0.2 + 0.1 * (10 - level); // opacity は 0 を超えないのでmax()は不要
@@ -560,7 +538,6 @@ var restartAnimation = (function(){
   }else if(_st.mozAnimation !== undefined){
     domAnimation = 'webkitAnimation';
   }
-  console.log(domAnimation);
   
   var _reset = function(elm){
     elm.style[domAnimation] = '';
@@ -592,43 +569,46 @@ var restartAnimation = (function(){
 
 // Visualize
 
-function createAnima(duration){
-  initX = Math.floor(Math.random() * window.innerWidth);
-  initY = Math.random() < 0.5? -30: window.innerHeight;
+function createAnima(duration) {
+  var initX = Math.floor(Math.random() * window.innerWidth);
+  var initY = Math.random() < 0.5? -30: window.innerHeight;
   
   var frog = document.createElement('div');
   frog.className = 'frog';
-  if(frog.textContent !== undefined){
-    frog.textContent = 'o o'; //眼の描画    
-  }else{
-    frog.innerText = 'o o'; //眼の描画    
+  // 眼の描画
+  if (frog.textContent !== undefined) {
+    frog.textContent = 'o o';
+  } else {
+    frog.innerText = 'o o';
   }
   frog.style.left = initX + 'px';
   frog.style.top = initY + 'px';
-  if(isMobile){
+  if (isMobile.any) {
     frog.style.boxShadow = 'none';
   }
-  
-  $(frog).animaMove(animaX - initX, animaY - initY, duration * 1000);
+  $(frog).animaMove(animaX, animaY, duration * 1000);
   parentElm.insertBefore(frog, parentElm.childNodes[0]);
 }
 
-$.fn.animaMove = function(x, y, duration){
-  var obj = $(this);
-  //var animaTimer;
-  obj.transition({left: '+='+x, top: '+='+y, opacity: '1'}, interval, function(){
+$.fn.animaMove = function(x, y, duration) {
+  var $this = $(this);
+  $this.animate({
+    left: x,
+    top: y,
+    opacity: '1'
+  }, interval, function() {
     //playPiano2();
-    obj.transit({left: '-=100', top: '+=100'}, interval, function(){
+    $this.transition({left: '-=100', top: '+=100'}, interval, function() {
       //playPiano2();
-      obj.transit({left: '+=100', top: '+=100'}, interval);
-      obj.addClass('released');
+      $this.transition({left: '+=100', top: '+=100'}, interval);
+      $this.addClass('released');
     });
   });
 };
 
 var canvas, canvasCtx, canvasWidth, canvasHeight, bar_width;
 
-$(function(){
+$(function() {
   canvas = document.getElementById('waveform');
   canvasCtx = canvas.getContext('2d');
   canvasWidth = canvas.width;
@@ -650,10 +630,9 @@ function drawSpectrum(){
   }
 }
 
+//User Interfaces
 
-//User Interface
-
-$(function(){
+$(function() {
   //ポーズボタン
   var controlPause = document.getElementById('track-control-pause');
   

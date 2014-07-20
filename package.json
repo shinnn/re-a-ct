@@ -22,8 +22,7 @@
   "devDependencies": {
     "coffeelint": "^1.5.2",
     "grunt": "^0.4.5",
-    "grunt-autoprefixer": "^0.8.0",
-    "grunt-bower-task": "^0.3.4",
+    "grunt-autoprefixer": "^0.8.2",
     "grunt-concurrent": "^0.5.0",
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-compass": "^0.9.0",
@@ -35,12 +34,15 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "^0.5.0",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-es6-transpiler": "^0.1.0",
     "grunt-gh-pages": "^0.9.1",
     "grunt-lodash": "~0.3.0",
     "grunt-modernizr": "^0.5.2",
     "grunt-shell": "^0.7.0",
-    "load-grunt-tasks": "^0.6.0",
-    "lodash-cli": "~2.4.1",
+    "grunt-usemin": "^2.3.0",
+    "grunt-wiredep": "^1.8.0",
+    "jit-grunt": "^0.7.0",
+    "lodash-cli": "~2.4.2",
     "uglify-save-license": "^0.4.1"
   }
 }

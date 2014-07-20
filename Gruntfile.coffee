@@ -1,7 +1,10 @@
 module.exports = (grunt) ->
   'use strict'
 
-  require('load-grunt-tasks')(grunt)
+  require('jit-grunt') grunt, {
+    useminPrepare: 'grunt-usemin'
+    es6transpiler: 'grunt-es6-transpiler'
+  }
   
   BIN = "#{ process.cwd() }/node_modules/.bin/"
   
@@ -32,7 +35,7 @@ module.exports = (grunt) ->
       beatArray.unshift beatPoint
       beatPoint -= preBeat
     
-    analysis.tracks[cfg 'trackPath'] = { beat_times: beatArray }
+    analysis.tracks[cfg 'trackPath'] = {beat_times: beatArray}
     cb()
 
   grunt.registerTask '_writeAnalysis', ->
@@ -113,15 +116,6 @@ module.exports = (grunt) ->
     
     clean:
       site: DEST
-      
-    bower:
-      options:
-        targetDir: "#{ DEST }.tmp/bower_exports/"
-        cleanTargetDir: true
-      install:
-        options:
-          bowerOptions:
-            production: true
     
     lodash:
       options:
@@ -153,65 +147,66 @@ module.exports = (grunt) ->
         ]
       public:
         files: [
-          expand: true
-          cwd: 'public/'
-          src: ['**', '!**/{.DS_Store,Thumbs.db}']
-          dest: DEST
-          dot: true
+          {
+            expand: true
+            cwd: 'public/'
+            src: ['**', '!**/{.DS_Store,Thumbs.db}']
+            dest: DEST
+            dot: true
+          }
+          {
+            src: 'bower_components/jquery/dist/jquery.js'
+            dest: "#{ DEST }/js/jquery.js"
+          }
         ]
-      bower:
-        files: [
-          expand: true
-          cwd: '<%= bower.options.targetDir %>/public'
-          src: ['**', '!**/{.DS_Store,Thumbs.db}']
-          dest: "#{ DEST }bower_components"
-          dot: true
-        ]
-      bower_debug:
-        files: [
-          expand: true
-          cwd: '<%= bower.options.targetDir %>/debug'
-          src: ['**', '!**/{.DS_Store,Thumbs.db}']
-          dest: "#{ DEST }/debug/bower_components"
-          dot: true
-        ]
+        
+    wiredep:
+      dev:
+        src: ['<%= jade.dev.dest %>']
+        devDependencies: true
+        exclude: ['/jquery\/dist/']
+      dist:
+        src: ['<%= jade.dist.dest %>']
+        exclude: ['/jquery\/dist/']
+    
+    useminPrepare:
+      options:
+        dest: DEST
+      html: ['<%= jade.dist.dest %>']
+
+    usemin:
+      html: '<%= jade.dist.dest %>'
     
     jshint:
       options:
         jshintrc: '.jshintrc'
       all: ['js/main/*.js']
     
+    es6transpiler:
+      options:
+        environment: ['browser', 'jquery']
+        disallowUnknownReferences: false
+      main:
+        files: [
+          expand: true
+          cwd: 'js/main/'
+          src: ['*.js']
+          dest: "#{ DEST }debug/js/"
+          dot: true
+        ]
+    
     uglify:
       options:
         preserveComments: require 'uglify-save-license'
-      main:
-        options:
-          banner: "/*! (c) 2013 - 2014 Shinnosuke Watanabe | MIT License */\n"
-          compress:
-            global_defs:
-              DEBUG: false
-            dead_code: true
-        src: '<%= coffee.dist.dest %>'
-        dest: '<%= uglify.main.src %>'
-      bower:
-        options:
-          compress:
-            # For /*cc_on!*/ comments
-            dead_code: false
-        files: [
-          expand: true
-          cwd: '<%= bower.options.targetDir %>'
-          src: [
-            '{,*/,*/*/}*.js',
-            '!{,*/,*/*/}*{.min,-min}.js', '!debug/{,*/}*.js'
-          ]
-          dest: '<%= bower.options.targetDir %>'
-        ]
+        compress:
+          global_defs:
+            DEBUG: false
+          dead_code: true
     
     compass:
       options:
         sassDir: 'scss'
-        cssDir: "#{ DEST }css"
+        cssDir: "#{ DEST }debug/css"
         environment: 'development'
         outputStyle: 'expand'
       dist: {}
@@ -223,27 +218,16 @@ module.exports = (grunt) ->
     cssmin:
       options:
         report: 'min'
-      dist:
-        files: [
-          expand: true
-          cwd: '<%= compass.options.cssDir%>'
-          src: ['{,*/}*.css']
-          dest: "#{ DEST }css/"
-        ]
-    
-    concat:
-      main:
-        src: ['js/main/*.js']
-        dest: "#{ DEST }js/re-a-ct.js"
-      vendor:
-        src: [
-          "js/vendor/{,*/}*.js"
-          '<%= bower.options.targetDir %>{,*/,*/*/}*.js'
-          '!<%= bower.options.targetDir %>{public,ie,debug}{,*/,*/*/}*.js'
-        ]
-        dest: "#{ DEST }js/vendor.js"
     
     jade:
+      options:
+        pretty: true
+      dev:
+        options:
+          data:
+            DEBUG: true
+        src: ['jade/index.jade']
+        dest: "#{ DEST }debug.html"
       dist:
         src: ['jade/index.jade']
         dest: "#{ DEST }index.html"
@@ -252,6 +236,12 @@ module.exports = (grunt) ->
       options:
         livereload: 35729
         port: 8000
+        middleware: (connect) ->
+          bowerFiles = connect.static './bower_components'
+          [
+            connect().use '/bower_components', bowerFiles
+            connect.static DEST
+          ]
       site:
         options:
           base: DEST
@@ -262,22 +252,22 @@ module.exports = (grunt) ->
 
       compass:
         files: ['scss/*.scss']
-        tasks: ['compass', 'autoprefixer', 'cssmin']
+        tasks: ['buildCSS', 'postBuildHTML']
       js_main:
         files: ['js/main/*.js']
-        tasks: ['jshint', 'concat:main']
+        tasks: ['jshint', 'postBuildHTML']
       js_vendor:
         files: ['js/vendor/*.js']
-        tasks: ['concat:vendor']
+        tasks: ['postBuildHTML']
       coffeelint:
         files: ['Gruntfile.coffee']
         tasks: ['shell:coffeelint']
       jade:
         files: ['jade/**/*.jade']
-        tasks: ['jade']
+        tasks: ['jade', 'buildHTML', 'postBuildHTML']
       html:
-        files: ["#{ DEST }index.html"]
-    
+        files: ["#{ DEST }*.html"]
+
     'gh-pages':
       site:
         options:
@@ -286,18 +276,29 @@ module.exports = (grunt) ->
           user:
             name: 'shinnn'
         src: ['**/*', '.nojekyll']
+    
+    concurrent:
+      prepare: ['jshint', 'analysis', 'encode', 'shell:coffeelint']
+      compile: ['buildCSS', 'es6transpiler', 'buildHTML']
+
+  grunt.registerTask 'buildCSS', ['compass', 'autoprefixer']
+
+  grunt.registerTask 'buildHTML', ['jade', 'wiredep']
+
+  grunt.registerTask 'postBuildHTML', [
+    'useminPrepare'
+    'concat'
+    'cssmin'
+    'uglify'
+    'usemin'
+  ]
   
   grunt.registerTask 'build', [
     'clean'
-    'jshint'
-    'bower'
-    'analysis'
-    'encode'
-    'compass', 'autoprefixer', 'cssmin'
-    'concat', 'shell:coffeelint'
-    'jade'
+    'concurrent:prepare'
+    'concurrent:compile'
+    'postBuildHTML'
     'copy:public'
-    'connect', 'watch'
   ]
 
   grunt.registerTask 'default', ['build', 'connect', 'watch']

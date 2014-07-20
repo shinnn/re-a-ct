@@ -1,7 +1,6 @@
-.sass-cache
 .grunt
+.sass-cache
+.tmp
 bower_components
-site
-
-npm-debug.log
 node_modules
+site

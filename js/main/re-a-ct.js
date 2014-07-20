@@ -1,6 +1,6 @@
 var ctx = new AudioContext();
 
-window.Dominant = function(audioContext){
+window.Dominant = function(audioContext) {
   //tmp
 };
 
@@ -104,14 +104,12 @@ $(function(){
   
   parentElm = document.getElementById('container');
   
-  function playTypeLevel(type, codec){
-    var str = document.createElement('audio').canPlayType(
+  function playTypeLevel(type, codec) {
+    let playability = document.createElement('audio').canPlayType(
       'audio/' + type + (codec? '; codecs=' + codec: '')
     );
     
-    if(str === 'probably') { return 2; }
-    if(str === 'maybe') { return 1; }
-    return 0;
+    return canPlayTypeLevel(playability);
   }
   
   var fileFormat, fileBitRate;
@@ -174,14 +172,6 @@ $(function(){
   bgloop.autoplay = false;
   bgloop.loop = false;
   
-  // MediaElement
-  /*
-  window.addEventListener('load', function(){
-    var bgsource = ctx.createMediaElementSource(bgloop);
-    bgsource.connect(analyzer);  
-  }, false);
-  */
-    
   var pointingEvent;
   if (parentElm.ontouchstart !== undefined) {
     pointingEvent = 'touchstart';
@@ -254,7 +244,7 @@ $(function(){
   //m key binding
   // http://yuiblog.com/blog/2008/07/22/non-blocking-scripts/
   var ss = document.createElement('link');
-  ss.href = 'css/rect.css';
+  ss.href = 'debug/css/rect.css';
   ss.rel = 'stylesheet';
   ss.media = 'screen';
 

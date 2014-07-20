@@ -1,0 +1,12 @@
+mixin loadJQuery(version)
+  script(src='//ajax.googleapis.com/ajax/libs/jquery/#{version}/jquery.min.js')
+
+  - var jQueryFallbacks = [];
+  - jQueryFallbacks[0] = 'http://code.jquery.com/jquery-' + version + '.min.js';
+  - jQueryFallbacks[1] = 'js/jquery' + (version.charAt(0) === '1'? '1': '') +'.js';
+
+  each url in jQueryFallbacks
+    script.
+      window.jQuery || document.write('<script src=#{url}><\/script>');
+
+mixin loadJQuery('2.1.1')

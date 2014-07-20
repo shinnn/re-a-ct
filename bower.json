@@ -11,35 +11,26 @@
     "jquery": "latest",
     "jquery.transit": "latest",
     "mousetrap": "latest",
+    "jquery-collision": "http://sourceforge.net/projects/jquerycollision/files/jquerycollision1.0.2min.tar.gz",
     "jquery-ui-touch-punch": "latest",
     "screenfull": "latest",
     "audiocontext-polyfill": "latest",
-    "isMobile": "latest"
+    "isMobile": "latest",
+    "normalize-css": "latest",
+    "can-play-type-to-number": "latest"
   },
   "devDependencies": {
     "benchmark": "latest"
   },
-  "exportsOverride": {
-    "jquery": {
-      "public": "dist/jquery.min.js"
-    },
-    "jquery.transit": {
-      "jquery.transit": "jquery.transit.js"
-    },
-    "mousetrap": {
-      "mousetrap": "mousetrap.min.js"
+  "overrides": {
+    "jquery-collision": {
+      "main": "jquery-collision.js"
     },
     "jquery-ui-touch-punch": {
-      "jquery-ui-touch-punch": "jquery.ui.touch-punch.js"
-    },
-    "screenfull": {
-      "screenfull": "dist/screenfull.min.js"
+      "main": "jquery.ui.touch-punch.js"
     },
     "isMobile": {
-      "isMobile": "isMobile.js"
-    },
-    "benchmark": {
-      "debug": "./benchmark.js"
+      "main": "isMobile.js"
     }
   }
 }

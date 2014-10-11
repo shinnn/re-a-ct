@@ -2,8 +2,8 @@ module.exports = (grunt) ->
   'use strict'
 
   require('jit-grunt') grunt, {
-    useminPrepare: 'grunt-usemin'
     es6transpiler: 'grunt-es6-transpiler'
+    useminPrepare: 'grunt-usemin'
   }
   
   BIN = "#{ process.cwd() }/node_modules/.bin/"
@@ -162,13 +162,17 @@ module.exports = (grunt) ->
         
     wiredep:
       dev:
+        options:
+          devDependencies: true
+          exclude: ['/jquery\/dist/']
         src: ['<%= jade.dev.dest %>']
-        devDependencies: true
-        exclude: ['/jquery\/dist/']
+        dest: '<%= jade.dev.dest %>'
       dist:
+        options:
+          exclude: ['/jquery\/dist/']
         src: ['<%= jade.dist.dest %>']
-        exclude: ['/jquery\/dist/']
-    
+        dest: '<%= jade.dist.dest %>'
+
     useminPrepare:
       options:
         dest: DEST

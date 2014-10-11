@@ -17,7 +17,7 @@
     "audiocontext-polyfill": "latest",
     "isMobile": "latest",
     "normalize-css": "latest",
-    "can-play-type-to-number": "latest"
+    "audio-support-level": "latest"
   },
   "devDependencies": {
     "benchmark": "latest"

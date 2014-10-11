@@ -1,44 +1,5 @@
 var ctx = new AudioContext();
 
-window.Dominant = function(audioContext) {
-  //tmp
-};
-
-Dominant.createPlaylist = function() {
-  var Playlist = {};
-  Playlist.tracks = [];
-  Playlist.currentTrack = null;
-  Playlist.currentTime = 0;
-  
-  this.play = function() {
-    if (!!Playlist.currentTrack) {
-      Playlist.currentTrack.play();
-    } else {
-      if(Playlist.tracks.length > 0) {
-        Playlist.tracks[0].play();
-        Playlist.currentTrack  = Playlist.tracks[0];
-      }
-    }
-  };
-  
-  Playlist.nextTrack = function() {
-    //tmp
-  };
-  
-  Playlist.prevTrack = function() {
-    //tmp
-  };
-  
-  Playlist.onplay = null;
-  Playlist.onpause = null;
-
-  return Playlist;
-};
-
-Dominant.loadPlaylist = function() {
-  var json;
-};
-
 var panner;
 var bufferLoader;
 var analyzer;
@@ -82,12 +43,12 @@ $.ajax({
   url: 'audio/data-json/src.json',
   dataType: 'json',
   async: false,
-  success: function(data){
+  success: function(data) {
     src = data;
   }
 });
 
-$(function(){
+$(function() {
   // フルスクリーン
   Mousetrap.bind(['f', 'F'], screenfull.request);
   
@@ -104,18 +65,10 @@ $(function(){
   
   parentElm = document.getElementById('container');
   
-  function playTypeLevel(type, codec) {
-    let playability = document.createElement('audio').canPlayType(
-      'audio/' + type + (codec? '; codecs=' + codec: '')
-    );
-    
-    return canPlayTypeLevel(playability);
-  }
-  
   var fileFormat, fileBitRate;
 	
   if (isMobile.any) {
-    if (playTypeLevel('mp4', 'mp4a.40.5') > 0) {
+    if (audioSupportLevel('mp4', 'mp4a.40.5') > 0) {
       fileFormat = 'm4a';
     }
   
@@ -123,10 +76,10 @@ $(function(){
     fileFormat = 'wav';
 
   } else {
-    if (playTypeLevel('mp4', 'mp4a.40.5') >= playTypeLevel('webm', 'vorbis')) {
+    if (audioSupportLevel('mp4', 'mp4a.40.5') >= audioSupportLevel('webm', 'vorbis')) {
       fileFormat = 'm4a';
 
-    } else if (playTypeLevel('webm', 'vorbis') >= playTypeLevel('ogg', 'vorbis')) {
+    } else if (audioSupportLevel('webm', 'vorbis') >= audioSupportLevel('ogg', 'vorbis')) {
         fileFormat = 'webm';
       
     } else {

@@ -3,10 +3,10 @@ mixin loadJQuery(version)
 
   - var jQueryFallbacks = [];
   - jQueryFallbacks[0] = 'http://code.jquery.com/jquery-' + version + '.min.js';
-  - jQueryFallbacks[1] = 'js/jquery' + (version.charAt(0) === '1'? '1': '') +'.js';
+  - jQueryFallbacks[1] = 'js/jquery.js';
 
   each url in jQueryFallbacks
     script.
       window.jQuery || document.write('<script src=#{url}><\/script>');
 
-mixin loadJQuery('2.1.1')
++loadJQuery('2.1.1')

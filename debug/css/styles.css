@@ -148,15 +148,9 @@
   border: 1px solid #333;
   box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
-  background: -webkit-linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
-  /* Chrome10+,Safari5.1+ */
-  /* Opera 11.10+ */
-  /* IE10+ */
-  background: linear-gradient(top, rgba(69, 72, 77, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%);
-  /* W3C */
 }
 
-/* line 145, ../../../scss/_interface.scss */
+/* line 141, ../../../scss/_interface.scss */
 .icon_volume {
   content: "";
   position: absolute;
@@ -168,7 +162,7 @@
   margin-top: -5px;
 }
 
-/* line 155, ../../../scss/_interface.scss */
+/* line 151, ../../../scss/_interface.scss */
 .ui-slider-handle {
   position: absolute;
   z-index: 2;
@@ -183,15 +177,9 @@
   margin-left: -12px;
 }
 
-/* line 168, ../../../scss/_interface.scss */
+/* line 164, ../../../scss/_interface.scss */
 .ui-slider-range {
   background: #ffffff;
-  /* Old browsers */
-  background: -webkit-linear-gradient(top, #ffffff 0%, #eaeaea 100%);
-  background: linear-gradient(top, #ffffff 0%, #eaeaea 100%);
-  /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea',GradientType=0 );
-  /* IE6-9 */
   position: absolute;
   border: 0;
   top: 0;
